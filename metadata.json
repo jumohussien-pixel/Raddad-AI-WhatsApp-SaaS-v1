@@ -1,0 +1,6 @@
+{
+  "name": "WhatsApp AI Customer Service Backend",
+  "description": "Scalable WhatsApp AI customer service assistant for Egyptian SMBs powered by Node.js and Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

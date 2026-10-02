@@ -1,0 +1,108 @@
+{
+  "id": "clothing_01",
+  "type": "clothing",
+  "name": "Modern Style Fashion",
+  "tagline": "Latest trends in premium streetwear & casual fashion made of 100% fine cotton",
+  "location": "Flagship Store: Fashion District, Downtown (With fast worldwide shipping)",
+  "workingHours": "Daily from 10:00 AM to 11:00 PM",
+  "phone": "+1 555 100 0004",
+  "vodafoneCash": "+1 555 100 0004",
+  "policy": "Inspection and sizing try-on are fully permitted with the delivery agent before making any payment. Free 14-day exchange or refund guarantee.",
+  "deliveryZones": [
+    {
+      "zone": "Standard Domestic Delivery",
+      "fee": 10,
+      "eta": "24 to 48 business hours"
+    },
+    {
+      "zone": "Express Courier Delivery",
+      "fee": 15,
+      "eta": "Same-day or next-day delivery"
+    },
+    {
+      "zone": "International Worldwide Shipping",
+      "fee": 30,
+      "eta": "3 to 5 business days"
+    }
+  ],
+  "paymentMethods": [
+    "Cash on Delivery (COD) with try-before-buy inspection rights",
+    "Credit Card & Debit Card (Visa / Mastercard / Stripe)",
+    "PayPal & Apple Pay"
+  ],
+  "items": [
+    {
+      "id": "cloth_01",
+      "name": "Pure Egyptian Cotton Oversized Tee",
+      "category": "T-Shirts",
+      "price": 25.99,
+      "sizes": [
+        "M (120-150 lbs)",
+        "L (150-175 lbs)",
+        "XL (175-200 lbs)",
+        "XXL (200-230 lbs)",
+        "3XL (230-260 lbs)"
+      ],
+      "colors": [
+        "Emerald Green",
+        "Carbon Black",
+        "Pure White",
+        "Desert Beige",
+        "Military Olive",
+        "Navy Blue"
+      ],
+      "description": "100% pure premium Egyptian cotton, heavy weight (240 GSM), pre-shrunk and treated against pilling. Perfect modern oversized fit with a relaxed street silhouette.",
+      "fabric": "100% Pure Egyptian Cotton, 240 GSM Heavyweight Pre-shrunk",
+      "care": "Machine wash cold 30°C inside out, do not bleach, iron at medium heat from inside, dry in shade.",
+      "inStock": true
+    },
+    {
+      "id": "cloth_02",
+      "name": "Casual Cool-Feel Linen Shirt",
+      "category": "Shirts",
+      "price": 29.99,
+      "sizes": [
+        "M (120-150 lbs)",
+        "L (150-175 lbs)",
+        "XL (175-200 lbs)",
+        "XXL (200-230 lbs)",
+        "3XL (230-260 lbs)"
+      ],
+      "colors": [
+        "Mint Green",
+        "Pure White",
+        "Sky Blue",
+        "Sandy Beige",
+        "Olive Green"
+      ],
+      "description": "100% organic natural linen, ultra-breathable and lightweight. Tailored for comfort in warm climates with a casual relaxed collar.",
+      "fabric": "100% Natural Organic Linen",
+      "care": "Hand wash or delicate cycle with cold water, dry flat in shade, steam iron.",
+      "inStock": true
+    },
+    {
+      "id": "cloth_03",
+      "name": "Casual Street-Style 6-Pocket Cargo Pants",
+      "category": "Pants",
+      "price": 34.99,
+      "sizes": [
+        "30",
+        "32",
+        "34",
+        "36",
+        "38",
+        "40"
+      ],
+      "colors": [
+        "Military Olive",
+        "Khaki Beige",
+        "Carbon Black",
+        "Dark Grey"
+      ],
+      "description": "Heavyweight imported cotton gabardine fabric. Spacious utility side cargo pockets with durable double-needle stitching.",
+      "fabric": "98% Cotton Gabardine, 2% Lycra for stretch and durability",
+      "care": "Wash inside out with cold water, iron at medium heat.",
+      "inStock": true
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "provider": "green_api",
+  "greenApi": {
+    "instanceId": "710722741559",
+    "apiToken": "656b27ec247545968dc4f55a2cc1521eb5ea8942a574425f8e",
+    "host": "https://7107.api.greenapi.com"
+  },
+  "meta": {
+    "phoneNumberId": "",
+    "accessToken": ""
+  }
+}
