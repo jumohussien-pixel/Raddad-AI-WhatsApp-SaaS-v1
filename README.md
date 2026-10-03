@@ -1,13 +1,7 @@
 # Raddad (ردّاد) — Production-Ready AI WhatsApp SaaS Engine for Retail & F&B Multi-Tenancy
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-20.x-green?logo=node.js)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-4.21-lightgrey?logo=express)](https://expressjs.com/)
-[![Google Gemini API](https://img.shields.io/badge/Gemini%20AI-3.8%20Flash-orange?logo=google)](https://ai.google.dev/)
-[![React 19](https://img.shields.io/badge/React-19-cyan?logo=react)](https://react.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4-38bdf8?logo=tailwindcss)](https://tailwindcss.com/)
-[![Docker Ready](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)](https://www.docker.com/)
-[![License: Commercial Turnkey](https://img.shields.io/badge/License-Commercial%20Turnkey-purple)](https://acquire.com)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?logo=typescript) &nbsp; ![Node.js](https://img.shields.io/badge/Node.js-20.x-green?logo=node.js) &nbsp; ![Express](https://img.shields.io/badge/Express-4.21-lightgrey?logo=express) &nbsp; ![Google Gemini API](https://img.shields.io/badge/Gemini%20AI-3.8%20Flash-orange?logo=google)  
+![React 19](https://img.shields.io/badge/React-19-cyan?logo=react) &nbsp; ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-v4-38bdf8?logo=tailwindcss) &nbsp; ![Docker Ready](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker) &nbsp; ![License: Commercial Turnkey](https://img.shields.io/badge/License-Commercial%20Turnkey-purple)
 
 > **Autonomous B2B Conversational Commerce & Customer Support Infrastructure Powered by Google Gemini 3.8 Flash, Multi-Tenant Express Router, and Dual Meta Cloud / Green API WhatsApp Gateways.**
 
@@ -17,11 +11,16 @@
 
 Buyers on **Acquire.com**, **Flippa**, or **GitHub** can test the fully functional production system immediately without setting up or installing anything:
 
-| Channel | Direct Access Link | Experience & Capability |
+| Channel | Access Link | Experience & Capability |
 | :--- | :--- | :--- |
-| 🌐 **Live Web Control Center** | [https://ais-pre-a3vdaa3zytu2fvakzvh656-913581071420.europe-west2.run.app](https://ais-pre-a3vdaa3zytu2fvakzvh656-913581071420.europe-west2.run.app) | Full English dashboard. Click **"Auto-Play Demo Walkthrough"** for a self-running 60s tour! |
-| 📱 **Live Production WhatsApp Bot** | [https://wa.me/201132044823](https://wa.me/201132044823?text=Hi%2C%20I%20would%20like%20to%20test%20the%20Raddad%20WhatsApp%20AI%20engine%21) | Chat on phone (`+20 113 204 4823`) to experience real sub-second Egyptian/English AI responses. |
-| 🧪 **In-Memory Local Sandbox** | `/api/chat/simulate` in Dashboard | Test unlimited conversations with zero SMS or external WhatsApp fees. |
+| 🌐 **Live Control Center** | [Open Dashboard][demo-url] | Full English dashboard. Click **"Auto-Play Demo Walkthrough"** for a tour! |
+| 📱 **Production WhatsApp** | [Chat on WhatsApp][wa-url] | Experience real sub-second Egyptian/English AI responses. |
+| 🧪 **In-Memory Sandbox** | `/api/chat/simulate` | Test unlimited conversations with zero external WhatsApp fees. |
+
+[demo-url]: https://ais-pre-a3vdaa3zytu2fvakzvh656-913581071420.europe-west2.run.app
+[wa-url]: https://wa.me/201132044823?text=Hi%2C%20I%20would%20like%20to%20test%20the%20Raddad%20WhatsApp%20AI%20engine%21
+
+<br />
 
 ---
 
@@ -36,6 +35,8 @@ Buyers on **Acquire.com**, **Flippa**, or **GitHub** can test the fully function
 * 🛡️ **Enterprise Security Shield:** Defends against prompt injection attacks, LLM jailbreaks, system prompt exfiltration, and replay exploits.
 * 💰 **High Commercial Valuation:** Built for B2B SaaS founders and agencies looking to onboard hundreds of merchant subscribers on a single server cluster or deploy custom white-label instances.
 
+<br />
+
 ---
 
 ## 2. Primary Live Demo Contact
@@ -46,53 +47,57 @@ Test the live production engine directly on WhatsApp without installing anything
 * 🔗 **Instant Click-to-Chat:** [https://wa.me/201132044823](https://wa.me/201132044823?text=Hi%2C%20I%20would%20like%20to%20test%20the%20Raddad%20WhatsApp%20AI%20engine%21)
 * 💡 **What to test:** Ask about pizza meal deals (Single vs Combo), request burger add-ons, inquire about sneakers sizes (e.g., *Air Jordan 1 size 43*), or ask about inspect-before-pay delivery policies.
 
+<br />
+
 ---
 
 ## 3. System Architecture
 
 ```text
-                                  +-------------------------------------------------------+
-                                  |            Incoming WhatsApp Ingestion                |
-                                  |   [Meta Cloud API]           [Green API Gateway]      |
-                                  +--------------------------+----------------------------+
-                                                             |
-                                                             v
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                    Express.js Multi-Tenant Webhook Ingestion Router                                     |
-|     /webhook/pizza-store          /webhook/burger-joint          /webhook/hml          /webhook/hpp                     |
-+------------------------------------------------------------+------------------------------------------------------------+
-                                                             |
-                                                             v
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                              Enterprise Security Shield                                                 |
-|   - Anti-Replay Cache (Message ID)         - Token Bucket Rate Limiter          - Prompt Injection Sanitizer            |
-+------------------------------------------------------------+------------------------------------------------------------+
-                                                             |
-                                                             v
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                 Concurrency Manager: Per-Phone Mutex Lock & Worker Pool                                 |
-|                               (Guarantees strictly sequential order processing per customer)                            |
-+------------------------------------------------------------+------------------------------------------------------------+
-                                                             |
-                                                             v
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                              Sliding Window Memory Store                                                |
-|                                    (Maintains last 10 contextual messages per tenant)                                   |
-+------------------------------------------------------------+------------------------------------------------------------+
-                                                             |
-                                                             v
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                           Dual AI Engine Orchestrator                                                   |
-|             Primary: Google Gemini 3.8 Flash SDK           <--->           Fallback: Local Rule-Based Engine            |
-|             (System instructions + Catalog context)                        (2.2s Circuit Breaker Fast Response)         |
-+------------------------------------------------------------+------------------------------------------------------------+
-                                                             |
-                                                             v
-+-------------------------------------------------------------------------------------------------------------------------+
-|                                      POS / Draft Order Structured Extractor                                             |
-|                     (Captures: Items, Portion Sizes, Add-ons, Address, Phone, Total EGP, Delivery ETA)                 |
-+-------------------------------------------------------------------------------------------------------------------------+
+                  +-----------------------------------------+
+                  |       Incoming WhatsApp Ingestion       |
+                  | [Meta Cloud API]     [Green API Gateway]|
+                  +--------------------+--------------------+
+                                       |
+                                       v
++--------------------------------------------------------------------------+
+|             Express.js Multi-Tenant Webhook Ingestion Router             |
+|  /webhook/pizza-store | /webhook/burger-joint | /webhook/hml | /webhook/hpp  |
++--------------------------------------+-----------------------------------+
+                                       |
+                                       v
++--------------------------------------------------------------------------+
+|                        Enterprise Security Shield                        |
+|   - Anti-Replay Cache      - Rate Limiter      - Injection Sanitizer     |
++--------------------------------------+-----------------------------------+
+                                       |
+                                       v
++--------------------------------------------------------------------------+
+|          Concurrency Manager: Per-Phone Mutex Lock & Worker Pool         |
+|       (Guarantees strictly sequential order processing per customer)      |
++--------------------------------------+-----------------------------------+
+                                       |
+                                       v
++--------------------------------------------------------------------------+
+|                       Sliding Window Memory Store                        |
+|            (Maintains last 10 contextual messages per tenant)            |
++--------------------------------------+-----------------------------------+
+                                       |
+                                       v
++--------------------------------------------------------------------------+
+|                       Dual AI Engine Orchestrator                        |
+|   Primary: Gemini 3.8 Flash SDK      <->      Fallback: Local Engine     |
+|   (Context + Catalog)                         (2.2s Circuit Breaker)     |
++--------------------------------------+-----------------------------------+
+                                       |
+                                       v
++--------------------------------------------------------------------------+
+|                  POS / Draft Order Structured Extractor                  |
+|   (Items, Sizes, Add-ons, Address, Phone, Total EGP, Delivery ETA)       |
++--------------------------------------------------------------------------+
 ```
+
+<br />
 
 ---
 
@@ -145,6 +150,10 @@ Raddad includes a dedicated security layer designed to prevent malicious exploit
 | **Secret Exfiltration Shield** | Filters model responses to ensure API keys, internal IDs, and raw system instructions are never revealed. | Zero risk of credential leaks via conversational trickery. |
 | **Per-Phone Mutex Lock** | Queues incoming messages from the same sender to ensure atomic sequential processing. | Eliminates race conditions in order placement. |
 
+<br />
+
+<br />
+
 ---
 
 ## 6. Technology Stack
@@ -155,6 +164,8 @@ Raddad includes a dedicated security layer designed to prevent malicious exploit
 * **WhatsApp Connectivity:** Meta Official Cloud API & Green API Gateway (dual-mode)
 * **Storage & Persistence:** In-Memory Worker Pools, Local JSON Registry, Extensible SQLite/PostgreSQL hook
 * **DevOps & Containerization:** Docker, Google Cloud Run, PM2 ready
+
+<br />
 
 ---
 
@@ -214,6 +225,8 @@ npm run build
 npm start
 ```
 
+<br />
+
 ---
 
 ## 8. Docker & Cloud Deployment
@@ -224,7 +237,9 @@ npm start
 docker build -t raddad-whatsapp-ai .
 
 # Run container on port 3000
-docker run -p 3000:3000 --env-file .env raddad-whatsapp-ai
+docker run -p 3000:3000 \
+  --env-file .env \
+  raddad-whatsapp-ai
 ```
 
 ### 1-Click Google Cloud Run Deployment
@@ -236,6 +251,8 @@ gcloud run deploy raddad-engine \
   --port 3000 \
   --set-env-vars GEMINI_API_KEY="your_key"
 ```
+
+<br />
 
 ---
 
@@ -252,6 +269,8 @@ gcloud run deploy raddad-engine \
 * `POST /api/chat/simulate` — Local zero-cost simulation endpoint for sandbox testing.
 * `GET /api/security/stats` — Real-time security telemetry and attack mitigation metrics.
 * `GET /api/health` — Platform health check, memory usage, and gateway latency.
+
+<br />
 
 ---
 
