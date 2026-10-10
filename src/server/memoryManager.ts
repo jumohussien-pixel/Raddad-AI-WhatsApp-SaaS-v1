@@ -18,14 +18,23 @@ export interface OrderDraft {
     quantity: number;
     price?: number;
     sizeOrColor?: string;
+    size?: string;
+    color?: string;
     notes?: string;
   }>;
   customerName?: string;
+  customer_name?: string;
   phone?: string;
+  contact_phone?: string;
   address?: string;
+  deliveryAddress?: string;
+  delivery_address?: string;
   paymentMethod?: string;
+  payment_method?: string;
   deliveryFee?: number;
   totalEstimated?: number;
+  total_estimated?: number;
+  currency?: string;
   status: 'inquiry' | 'collecting_info' | 'ready_to_confirm' | 'confirmed';
   notes?: string;
   updatedAt: number;
@@ -39,6 +48,9 @@ export interface UserSession {
   createdAt: number;
   lastActive: number;
   orderDraft: OrderDraft;
+  humanTakeover?: boolean;
+  lastConfirmedOrderId?: string;
+  orderConfirmedAt?: number;
   metadata?: Record<string, unknown>;
 }
 
@@ -48,6 +60,11 @@ export interface SessionStoreAdapter {
   getHistory(phoneNumber: string): Promise<ChatMessage[]>;
   clearSession(phoneNumber: string): Promise<boolean>;
   updateOrderDraft(phoneNumber: string, draft: Partial<OrderDraft>): Promise<UserSession>;
+  setHumanTakeover(phoneNumber: string, paused: boolean): boolean;
+  isHumanTakeover(phoneNumber: string): boolean;
+  isOrderRecentlyConfirmed(phoneNumber: string, thresholdMs?: number): boolean;
+  markOrderConfirmed(phoneNumber: string, orderId: string): void;
+  resetOrderConfirmation(phoneNumber: string): void;
   getAllSessions(): Promise<UserSession[]>;
   cleanupExpired(ttlMs: number): Promise<number>;
 }
@@ -59,11 +76,14 @@ export class InMemorySessionStore implements SessionStoreAdapter {
 
   constructor() {
     // Run periodic eviction every 15 minutes to prevent memory leaks in production
-    setInterval(() => {
+    const evictionTimer = setInterval(() => {
       this.cleanupExpired(this.DEFAULT_TTL_MS).catch((err) => {
         console.error('Session eviction routine error:', err);
       });
     }, 15 * 60 * 1000);
+    if (evictionTimer && typeof evictionTimer.unref === 'function') {
+      evictionTimer.unref();
+    }
   }
 
   /**
@@ -155,6 +175,67 @@ export class InMemorySessionStore implements SessionStoreAdapter {
     };
     session.lastActive = Date.now();
     return session;
+  }
+
+  /**
+   * Toggles Human Takeover mode for a customer's phone number
+   * When paused = true, the AI bot stays silent so merchant can chat directly without conflict
+   */
+  setHumanTakeover(phoneNumber: string, paused: boolean): boolean {
+    const cleanPhone = this.sanitizePhoneNumber(phoneNumber);
+    let session = this.sessions.get(cleanPhone);
+    if (!session) {
+      session = {
+        phoneNumber: cleanPhone,
+        businessType: 'clothing',
+        tenantId: 'hbb',
+        messages: [],
+        createdAt: Date.now(),
+        lastActive: Date.now(),
+        humanTakeover: paused,
+        orderDraft: {
+          items: [],
+          status: 'inquiry',
+          updatedAt: Date.now(),
+        },
+      };
+      this.sessions.set(cleanPhone, session);
+      return true;
+    }
+    session.humanTakeover = paused;
+    session.lastActive = Date.now();
+    return true;
+  }
+
+  isHumanTakeover(phoneNumber: string): boolean {
+    const cleanPhone = this.sanitizePhoneNumber(phoneNumber);
+    const session = this.sessions.get(cleanPhone);
+    return Boolean(session?.humanTakeover);
+  }
+
+  isOrderRecentlyConfirmed(phoneNumber: string, thresholdMs = 15 * 60 * 1000): boolean {
+    const cleanPhone = this.sanitizePhoneNumber(phoneNumber);
+    const session = this.sessions.get(cleanPhone);
+    if (!session || !session.orderConfirmedAt) return false;
+    return Date.now() - session.orderConfirmedAt < thresholdMs;
+  }
+
+  markOrderConfirmed(phoneNumber: string, orderId: string): void {
+    const cleanPhone = this.sanitizePhoneNumber(phoneNumber);
+    const session = this.sessions.get(cleanPhone);
+    if (session) {
+      session.lastConfirmedOrderId = orderId;
+      session.orderConfirmedAt = Date.now();
+    }
+  }
+
+  resetOrderConfirmation(phoneNumber: string): void {
+    const cleanPhone = this.sanitizePhoneNumber(phoneNumber);
+    const session = this.sessions.get(cleanPhone);
+    if (session) {
+      session.lastConfirmedOrderId = undefined;
+      session.orderConfirmedAt = undefined;
+    }
   }
 
   /**

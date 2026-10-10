@@ -1,0 +1,86 @@
+[
+  {
+    "id": "prod_hoodie_01",
+    "name": "هودي أوفر سايز ريفليكتف (Reflective Oversized Hoodie)",
+    "category": "clothes",
+    "price": 650,
+    "currency": "EGP",
+    "sizes": ["M", "L", "XL", "XXL"],
+    "colors": ["أسود فاحم", "رمادي ميلتون", "بيج ترابي"],
+    "description": "قطن ميلتون مصري تقيل مبطن بوبرة داخلية ناعمة، طباعة عاكسة للضوء على الظهر، قصة أوفر سايز مريحة جداً.",
+    "in_stock": true,
+    "sku": "HOD-OVR-01"
+  },
+  {
+    "id": "prod_tshirt_01",
+    "name": "تيشيرت أوفر سايز أسيد واش (Acid Wash Vintage T-Shirt)",
+    "category": "clothes",
+    "price": 380,
+    "currency": "EGP",
+    "sizes": ["M", "L", "XL", "XXL"],
+    "colors": ["أسود مغسول Acid Black", "زيتي مغسول Vintage Olive"],
+    "description": "قطن 100% سينجل جيرسي معالجة أسيد واش عصرية، لياقة دائرية محكمة وتقفيل دبل درزة ستريت وير.",
+    "in_stock": true,
+    "sku": "TSH-ACD-01"
+  },
+  {
+    "id": "prod_cargo_01",
+    "name": "بنطلون كارغو 6 جيوب ووتر بروف (Street Cargo Pants)",
+    "category": "clothes",
+    "price": 550,
+    "currency": "EGP",
+    "sizes": ["30", "32", "34", "36", "38"],
+    "colors": ["أسود مط", "زيتي جيشي", "بيج كارجو"],
+    "description": "خامة جبردين ووتر بروف معالجة ضد الماء والأتربة، 6 جيوب عملية مع أربطة تضييق من الأسفل لستايل جوجر.",
+    "in_stock": true,
+    "sku": "PNT-CRG-01"
+  },
+  {
+    "id": "prod_snk_panda",
+    "name": "سنيكرز نايكي دانك لو باندا (Nike Dunk Low Retro Panda)",
+    "category": "sneakers",
+    "price": 1250,
+    "currency": "EGP",
+    "sizes": ["41", "42", "43", "44", "45"],
+    "colors": ["أبيض × أسود (Panda)"],
+    "description": "ماستر كواليتي هاي إند مع الصندوق الأصلي، جلد طبيعي معالج، نعل مريح مانع للانزلاق، أنسب كوتشي كاجوال شبابي.",
+    "in_stock": true,
+    "sku": "SNK-DNK-01"
+  },
+  {
+    "id": "prod_snk_nb530",
+    "name": "سنيكرز نيو بالانس 530 (New Balance 530 Silver / White)",
+    "category": "sneakers",
+    "price": 1350,
+    "currency": "EGP",
+    "sizes": ["41", "42", "43", "44", "45"],
+    "colors": ["فضي ميتاليك × أبيض", "أبيض × أزرق كحلي"],
+    "description": "أخف وأريح سنيكرز للمشي والجامعة والجيم بنظام التوسيد ABZORB، تصميم شبكي جيد التهوية مع تفاصيل عاكسة.",
+    "in_stock": true,
+    "sku": "SNK-NB530-01"
+  },
+  {
+    "id": "prod_snk_campus",
+    "name": "سنيكرز أديداس كامبوس 00s (Adidas Campus 00s Suede)",
+    "category": "sneakers",
+    "price": 1200,
+    "currency": "EGP",
+    "sizes": ["41", "42", "43", "44", "45"],
+    "colors": ["أسود فحم × خطوط بيضاء", "رمادي شمواه", "كحلي داكن"],
+    "description": "شمواه طبيعي فاخر، أربطة عريضة Fat Laces بتصميم التسعينات الأيقوني، بطانة كاحل مريحة جداً.",
+    "in_stock": true,
+    "sku": "SNK-CMP-01"
+  },
+  {
+    "id": "prod_snk_jordan1",
+    "name": "سنيكرز إير جوردان 1 هاي (Air Jordan 1 High OG)",
+    "category": "sneakers",
+    "price": 1450,
+    "currency": "EGP",
+    "sizes": ["41", "42", "43", "44", "45"],
+    "colors": ["شيكاغو أحمر × أبيض × أسود", "شادو رمادي × أسود"],
+    "description": "التصميم الرياضي الأسطوري للشباب، رقبة عالية مبطنة تدعم الكاحل، وسادة هوائية Air-Sole مريحة طوال اليوم.",
+    "in_stock": true,
+    "sku": "SNK-JRD-01"
+  }
+]

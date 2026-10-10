@@ -123,7 +123,7 @@ export function analyzeSizingInput(text: string): SizingAnalysis {
     if (reqRank >= recRank + 2) {
       const note = `[SELF_CORRECTION] Customer weighs ${weightDisplay}${heightDisplay} with a standard recommended size of ${recommendedStandardSize}, but explicitly requested size ${requestedSize} for an oversized streetwear look. Action: Highly endorse their style preference, politely confirm that their standard size is ${recommendedStandardSize} but we will gladly prepare size ${requestedSize} to achieve their desired oversized fit perfectly without any hesitation!`;
       
-      const deterministicReply = `Hello there! 🌟\nWith your weight of ${weightDisplay}${heightDisplay}, your standard recommended size is ${recommendedStandardSize}. However, since you prefer an oversized, relaxed, and trendy streetwear look with size ${requestedSize}, we've got you covered! We will gladly prepare size ${requestedSize} to give you that perfect oversized drape! 👕✨\n\nWould you like to order this in a heavy t-shirt, hoodie, or casual linen shirt? Also, what color do you prefer?`;
+      const deterministicReply = `أهلاً بحضرتك يا غالي! 🌟\nبناءً على وزنك ${weightDisplay}${heightDisplay}، مقاسك المظبوط هو ${recommendedStandardSize}، لكن بما إنك حابب ستايل أوفر سايز واسع وستريت وير بمقاس ${requestedSize}، ده اختيار جامد جداً وهيديك قصة مريحة وشياكة عالية! 👕✨\nتحب نجهزهولك هودي أو تيشيرت؟ وأنهي لون تفضله؟`;
 
       return {
         hasSizingIntent: true,
@@ -143,7 +143,7 @@ export function analyzeSizingInput(text: string): SizingAnalysis {
     if (recRank >= reqRank + 2) {
       const note = `[SELF_CORRECTION] Customer weighs ${weightDisplay}${heightDisplay} with a standard recommended size of ${recommendedStandardSize}, but requested size ${requestedSize} which will be far too tight. Action: Politely warn them that size ${requestedSize} will be extremely tight, and strongly recommend size ${recommendedStandardSize} to ensure an elegant, comfortable fit that flows naturally with their body.`;
 
-      const deterministicReply = `Hello! Thank you for inquiring! 🌟\nBased on your weight of ${weightDisplay}${heightDisplay}, we highly recommend going with size ${recommendedStandardSize}. Size ${requestedSize} will likely be extremely tight and uncomfortable. Our ${recommendedStandardSize} is designed to fit your body shape beautifully and comfortably! ✨\n\nShall we proceed with size ${recommendedStandardSize} for your order? Which color do you prefer? 👕`;
+      const deterministicReply = `أهلاً بحضرتك يا فندم! 🌟\nبناءً على وزنك ${weightDisplay}${heightDisplay}، ننصحك جداً تختار مقاس ${recommendedStandardSize}، لأن مقاس ${requestedSize} هيكون ضيق جداً ومش مريح. مقاس ${recommendedStandardSize} هيديك راحة تامة وشكل مظبوط جداً على جسمك! ✨\nتحب نعتمد مقاس ${recommendedStandardSize}؟ وأنهي لون يناسبك؟ 👕`;
 
       return {
         hasSizingIntent: true,
@@ -177,19 +177,19 @@ export function analyzeSizingInput(text: string): SizingAnalysis {
   // Weight only provided
   if (detectedWeightKg !== null) {
     let deterministicReply = '';
-    const weightDisplay = detectedWeightLbs ? `${detectedWeightLbs} lbs` : `${detectedWeightKg} kg`;
-    const heightDisplay = detectedHeightFtIn ? ` (${detectedHeightFtIn})` : detectedHeightCm ? ` (${detectedHeightCm} cm)` : '';
+    const weightDisplay = detectedWeightLbs ? `${detectedWeightLbs} رطل` : `${detectedWeightKg} كجم`;
+    const heightDisplay = detectedHeightFtIn ? ` (${detectedHeightFtIn})` : detectedHeightCm ? ` (${detectedHeightCm} سم)` : '';
 
     if (detectedWeightKg <= 68) {
-      deterministicReply = `We'd love to help you with the sizing! 🌟 For your weight of ${weightDisplay}${heightDisplay}, your ideal standard fit is size M. If you prefer a loose, relaxed oversized fit, size L would be fantastic! Which one shall we prepare for you? 👕`;
+      deterministicReply = `منورنا يا غالي! 🌟 لوزنك ${weightDisplay}${heightDisplay}، مقاسك المظبوط في الملابس هو M، ولو حابب قصة أوفر سايز واسعة مقاس L هيكون ممتاز! تحب نجهزلك M ولا L؟ 👕`;
     } else if (detectedWeightKg <= 80) {
-      deterministicReply = `We'd love to help you with the sizing! 🌟 For your weight of ${weightDisplay}${heightDisplay}, your ideal standard fit is size L. If you prefer a loose, relaxed oversized look, size XL would be perfect! Which one do you prefer? 👕`;
+      deterministicReply = `منورنا يا غالي! 🌟 لوزنك ${weightDisplay}${heightDisplay}، مقاسك المظبوط هو L، وللأوفر سايز الواسع مقاس XL هيكون تحفة! سعر الهودي الأوفر سايز 650 جنيه مصري ومعاه معاينة وقياس قبل الدفع. تحب تختار L ولا XL؟ 👕`;
     } else if (detectedWeightKg <= 92) {
-      deterministicReply = `We'd love to help you with the sizing! 🌟 For your weight of ${weightDisplay}${heightDisplay}, your standard comfortable fit is size XL. If you prefer a stylish oversized streetwear look, we highly recommend size XXL! Shall we prepare size XXL for you? ✨`;
+      deterministicReply = `منورنا يا غالي! 🌟 لوزنك ${weightDisplay}${heightDisplay}، مقاسك المظبوط هو XL، وللأوفر سايز الستريت وير مقاس XXL! تحب نجهزلك XL ولا XXL؟ ✨`;
     } else if (detectedWeightKg <= 105) {
-      deterministicReply = `We'd love to help you with the sizing! 🌟 For your weight of ${weightDisplay}${heightDisplay}, your ideal comfortable fit is size XXL. It will offer a relaxed, highly premium look! What color would you like to check out? 👕`;
+      deterministicReply = `منورنا يا غالي! 🌟 لوزنك ${weightDisplay}${heightDisplay}، مقاس XXL هيكون مريح ومظبوط جداً عليك! تحب تختار أنهي لون؟ 👕`;
     } else {
-      deterministicReply = `We'd love to help you with the sizing! 🌟 For your weight of ${weightDisplay}${heightDisplay}, our size 3XL (Triple XL) is the perfect match. It offers a very comfortable, premium, and relaxed fit! What color do you prefer? 👕`;
+      deterministicReply = `منورنا يا غالي! 🌟 لوزنك ${weightDisplay}${heightDisplay}، مقاس 3XL هو الأنسب والأريح تماماً! تحب تختار أي موديل؟ 👕`;
     }
 
     return {

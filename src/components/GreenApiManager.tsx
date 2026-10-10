@@ -213,7 +213,7 @@ export const GreenApiManager: React.FC<GreenApiManagerProps> = ({ onConfigChange
     }
   };
 
-  const webhookEndpoint = `${window.location.origin}/webhook/tenant-koshary-prince`;
+  const webhookEndpoint = `${window.location.origin}/webhook/hbb`;
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);

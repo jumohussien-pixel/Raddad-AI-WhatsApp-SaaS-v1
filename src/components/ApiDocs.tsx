@@ -155,7 +155,7 @@ export const ApiDocs: React.FC = () => {
         <ol className="list-decimal list-inside space-y-2 text-slate-300 leading-relaxed">
           <li>Navigate to your Meta for Developers dashboard for your WhatsApp Business App.</li>
           <li>Under WhatsApp, select <strong>Configuration</strong> &gt; <strong>Webhook</strong>.</li>
-          <li>Set Callback URL: <code className="text-emerald-400 font-mono">https://YOUR_DOMAIN/webhook</code> (or tenant webhook: <code className="text-emerald-400 font-mono">/webhook/pizza-store</code>).</li>
+          <li>Set Callback URL: <code className="text-emerald-400 font-mono">https://YOUR_DOMAIN/webhook</code> (or store webhook: <code className="text-emerald-400 font-mono">/webhook/hbb</code>).</li>
           <li>Set Verify Token to your .env value: <code className="text-emerald-400 font-mono">raddad_saas_secure_token_2026</code>.</li>
           <li>Subscribe to the Webhook field named <code className="text-emerald-400 font-mono">messages</code>.</li>
         </ol>

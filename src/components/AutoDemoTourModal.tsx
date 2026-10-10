@@ -2,9 +2,8 @@
  * Auto-Play Interactive Product Tour Modal for Raddad AI WhatsApp SaaS Engine
  * 
  * Purpose:
- * Provides an automated, self-running video-like demonstration of the conversational
- * AI sales engine, restaurant sizing/upselling, and POS order extraction without
- * requiring manual screen recording.
+ * Provides an automated, self-running sandbox demo for HBB Store (Youth Streetwear & Sneakers)
+ * 100% Egyptian Arabic & EGP Standardization (جنيه مصري).
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -18,15 +17,15 @@ import {
   CreditCard,
   CheckCircle2,
   Clock,
-  ArrowRight,
   X,
   FastForward,
-  Utensils,
+  Shirt,
   Footprints,
   Smartphone,
   ExternalLink,
   Bot,
   User,
+  Timer,
 } from 'lucide-react';
 
 interface AutoDemoTourModalProps {
@@ -49,18 +48,18 @@ interface TourStep {
   };
 }
 
-const PIZZA_TOUR_STEPS: TourStep[] = [
+const HOODIE_TOUR_STEPS: TourStep[] = [
   {
     sender: 'user',
-    text: 'Good evening! Can I see your pizza menu and delivery options please?',
-    delayMs: 1400,
-    highlightNote: 'Step 1: Customer initiates inquiry with location intent.',
+    text: 'مساء الخير يا غالي! متاح عندكم هوديز أوفر سايز؟ وعايز اعرف الأسعار لو سمحت',
+    delayMs: 3000,
+    highlightNote: 'الخطوة 1: العميل يستفسر بالعامية المصرية عن الهوديز والأسعار.',
   },
   {
     sender: 'model',
-    text: 'Welcome to Bella Roma Pizza & Pastas! 🍕🔥 We bake authentic Italian stone-oven pizzas fresh to order in ~20 mins. Our top sellers tonight:\n• Pepperoni Supreme Stuffed Crust (Single: $14.99 | Combo: $19.99 | Family Box: $28.99)\n• Quattro Formaggi Truffle Pizza (Single: $15.99 | Combo: $20.99)\n• Creamy Chicken Alfredo Pasta ($13.99)\n\nWe deliver piping hot in 25–35 mins! Would you like a Single or a Combo meal with seasoned fries & drink?',
-    delayMs: 2200,
-    highlightNote: 'Step 2: AI welcomes customer, outlines portion tiers (Single/Combo/Family) & confirms delivery zone.',
+    text: 'مساء الورد يا فندم! 👕🔥 أهلاً بحضرتك في HBB Store لملابس الشباب العصرية.\n\nالمتاح عندنا حالياً بأعلى جودة:\n• هودي أوفر سايز ريفليكتف (ميلتون مصري تقيل): 650 جنيه مصري\n• تيشيرت أوفر سايز أسيد واش (Acid Wash): 380 جنيه مصري\n• بنطلون كارغو 6 جيوب ووتر بروف: 550 جنيه مصري\n\n🛡️ وميزتنا الذهبية: المعاينة والقياس مجانية مع المندوب قبل ما تدفع أي جنيه! تحب تختار موديل معين؟',
+    delayMs: 4000,
+    highlightNote: 'الخطوة 2: البوت يرحب ويعرض الأسعار بالجنيه المصري (EGP) ويؤكد ميزة المعاينة قبل الدفع.',
     extractedDraft: {
       items: [],
       status: 'collecting',
@@ -68,92 +67,132 @@ const PIZZA_TOUR_STEPS: TourStep[] = [
   },
   {
     sender: 'user',
-    text: 'Awesome, I want 1 Pepperoni Supreme Combo with extra mozzarella, and 1 loaded cheesy fries.',
-    delayMs: 1600,
-    highlightNote: 'Step 3: Customer picks meal tier and up-sells extra cheese add-on.',
+    text: 'طب أنا وزني 76 كجم وطولي 178 سم، أختار مقاس إيه في الهودي الريفليكتف عشان يجي أوفر سايز مظبوط؟',
+    delayMs: 3000,
+    highlightNote: 'الخطوة 3: العميل يشارك وزنه وطوله لطلب ترشيح المقاس المناسب.',
+  },
+  {
+    sender: 'model',
+    text: 'لوزن 76 كجم وطول 178، مقاس L هيكون تحفة جداً وستايله أوفر سايز مريح وشيك ستريت وير! 👕✨\n\nالألوان المتوفرة منه في المخزن:\n1. أسود فاحم (الأكثر طلباً)\n2. رمادي ميلتون\n3. بيج ترابي\n\nتحب نجهزلك أنهي لون يا غالي؟',
+    delayMs: 4000,
+    highlightNote: 'الخطوة 4: الذكاء الاصطناعي يرشح المقاس بدقة (L) ويعرض الألوان المتاحة في المخزن.',
+  },
+  {
+    sender: 'user',
+    text: 'عاش! جهزلي 1 هودي أسود فاحم مقاس L، وضيف عليه 1 بنطلون كارغو أسود مقاس 34. الشحن للمعادي هيتكلف كام؟',
+    delayMs: 3500,
+    highlightNote: 'الخطوة 5: العميل يختار القطع ويطلب حساب مصاريف الشحن لمنطقة المعادي.',
     extractedDraft: {
       items: [
-        { name: 'Pepperoni Supreme Pizza', sizeOrColor: 'Combo (+ Fries & Drink)', quantity: 1, price: 19.99 },
-        { name: 'Extra Mozzarella Stuffed Crust', sizeOrColor: 'Add-on', quantity: 1, price: 2.99 },
-        { name: 'Texas Loaded Cheesy Bacon Fries', sizeOrColor: 'Side', quantity: 1, price: 6.99 },
+        { name: 'هودي أوفر سايز ريفليكتف', sizeOrColor: 'مقاس L / أسود فاحم', quantity: 1, price: 650 },
+        { name: 'بنطلون كارغو ووتر بروف', sizeOrColor: 'مقاس 34 / أسود مط', quantity: 1, price: 550 },
       ],
-      totalEstimated: 29.97,
+      totalEstimated: 1200,
       status: 'collecting',
     },
   },
   {
     sender: 'model',
-    text: 'Delicious choice! 🍕✨ Stuffed crust with extra melted mozzarella is incredible. Would you like your meal regular or spicy with jalapeno slices?\n\nTo send this straight to our kitchen, please share your delivery address and name!',
-    delayMs: 2000,
-    highlightNote: 'Step 4: AI clarifies cooking instructions (spicy preference) and asks for checkout details.',
-  },
-  {
-    sender: 'user',
-    text: 'Make it mildly spicy please. Address: 742 Evergreen Terrace, Apt 4. Name: Karim Mansour, phone +1 555 100 0001. I will pay cash on delivery.',
-    delayMs: 1800,
-    highlightNote: 'Step 5: Customer sends name, detailed address, contact phone, and payment preference.',
+    text: 'اختيار جامد جداً وتنسيق ألوان شيك أوي! 🔥👕\n\n🛵 تفاصيل الشحن للمعادي (القاهرة): 45 جنيه مصري فقط، وبيوصلك خلال 24 - 48 ساعة.\n💰 إجمالي الأوردر: 1200 + 45 شحن = 1245 جنيه مصري.\n\nالمندوب بينتظر مع حضرتك تقيس الهودي والكارغو قبل الدفع! ابعتلي اسم حضرتك والعنوان بالتفصيل ورقم الموبايل لنأكد الحجز فوراً.',
+    delayMs: 4000,
+    highlightNote: 'الخطوة 6: البوت يحسب رسوم شحن القاهرة (45 ج.م) والإجمالي بدقة ويطلب بيانات التوصيل.',
     extractedDraft: {
       items: [
-        { name: 'Pepperoni Supreme Pizza (Mild Spicy)', sizeOrColor: 'Combo (+ Fries & Drink)', quantity: 1, price: 19.99 },
-        { name: 'Extra Mozzarella Stuffed Crust', sizeOrColor: 'Add-on', quantity: 1, price: 2.99 },
-        { name: 'Texas Loaded Cheesy Bacon Fries', sizeOrColor: 'Side', quantity: 1, price: 6.99 },
+        { name: 'هودي أوفر سايز ريفليكتف', sizeOrColor: 'مقاس L / أسود فاحم', quantity: 1, price: 650 },
+        { name: 'بنطلون كارغو ووتر بروف', sizeOrColor: 'مقاس 34 / أسود مط', quantity: 1, price: 550 },
       ],
-      address: '742 Evergreen Terrace, Apt 4',
-      paymentMethod: 'Cash on Delivery (COD)',
-      prepTime: '20 - 25 mins (ETA: 35 mins)',
-      totalEstimated: 34.97, // 29.97 + 5.00 delivery fee
-      status: 'confirmed',
+      paymentMethod: 'الدفع عند الاستلام بعد المعاينة والقياس (COD)',
+      prepTime: 'تجهيز فوري (توصيل خلال 24 - 48 ساعة)',
+      totalEstimated: 1245,
+      status: 'ready_to_confirm',
     },
   },
   {
+    sender: 'user',
+    text: 'أحمد محمود - القاهرة المعادي، شارع 9 عمارة 14 الدور 3 - تليفوني 01012345678 - دفع كاش بعد المعاينة.',
+    delayMs: 3500,
+    highlightNote: 'الخطوة 7: العميل يؤكد الاسم، العنوان بالتفصيل، ورقم التليفون.',
+  },
+  {
     sender: 'model',
-    text: '🎉 Order confirmed, Karim! Your order is now sizzling in the stone oven at Bella Roma!\n\n📋 Order Summary:\n• 1x Pepperoni Supreme Combo ($19.99)\n• 1x Extra Mozzarella Stuffed Crust ($2.99)\n• 1x Texas Loaded Cheesy Bacon Fries ($6.99)\n• Delivery to: 742 Evergreen Terrace, Apt 4\n• Total: $34.97 (includes $5.00 delivery fee)\n• Payment: Cash on Delivery\n• Estimated Delivery: 25 - 35 minutes.\n\nOur courier will notify you upon arrival. Enjoy your meal! 🍕❤️',
-    delayMs: 2400,
-    highlightNote: 'Step 6: Order atomically confirmed, dispatched to POS kitchen queue with real-time ETA.',
+    text: 'ألف مبروك يا أستاذ أحمد! 🎉 تم تأكيد حجز طلبك بنجاح وجاري تجهيزه للشحن فوراً!\n\n📋 ملخص الأوردر المعتمد:\n• هودي أوفر سايز ريفليكتف (L - أسود) = 650 ج.م\n• بنطلون كارغو 6 جيوب (34 - أسود) = 550 ج.م\n• مصاريف الشحن (المعادي) = 45 ج.م\n💰 الإجمالي المطلوب: 1245 جنيه مصري\n📍 العنوان: القاهرة - المعادي، شارع 9 عمارة 14\n🛡️ الضمان: المعاينة والقياس متاحة ومجانية مع المندوب قبل الدفع + ضمان استبدال 14 يوماً.\n\n🚨 تم إرسال تنبيه فوري لصاحب المحل على واتساب لإخراج القطع من المخزن وتجهيز الشحنة!',
+    delayMs: 5000,
+    highlightNote: 'الخطوة 8: إتمام الأوردر وإرسال إشعار فوري لصاحب المحل على رقمه الشخصي.',
+    extractedDraft: {
+      items: [
+        { name: 'هودي أوفر سايز ريفليكتف', sizeOrColor: 'مقاس L / أسود فاحم', quantity: 1, price: 650 },
+        { name: 'بنطلون كارغو ووتر بروف', sizeOrColor: 'مقاس 34 / أسود مط', quantity: 1, price: 550 },
+      ],
+      address: 'القاهرة - المعادي، شارع 9 عمارة 14 الدور 3',
+      paymentMethod: 'الدفع عند الاستلام بعد المعاينة والقياس',
+      prepTime: 'شحن فوري خلال 24 - 48 ساعة',
+      totalEstimated: 1245,
+      status: 'confirmed',
+    },
   },
 ];
 
 const SNEAKERS_TOUR_STEPS: TourStep[] = [
   {
     sender: 'user',
-    text: 'Hi! Do you have Air Jordan 1 Retro in size 43 in stock? Can I inspect and try it on before paying?',
-    delayMs: 1500,
-    highlightNote: 'Step 1: Customer asks for specific shoe model, size 43, and courier inspection policy.',
+    text: 'السلام عليكم، متاح عندكم كوتشي نايكي دانك باندا مقاس 43؟ وهل الخامة ماستر كواليتي؟',
+    delayMs: 3000,
+    highlightNote: 'الخطوة 1: العميل يستفسر عن كوتشي نايكي دانك باندا ومقاس 43.',
   },
   {
     sender: 'model',
-    text: 'Hello and welcome to HML Sneakers! 👟🔥 Yes, we have Air Jordan 1 Retro in size 43 (US 9.5) ready for immediate dispatch!\n\nAvailable colorways in 43:\n1. Chicago Classic (Red/White/Black) — $129.99\n2. Mocha Travis Edition (Brown/White) — $139.99\n3. Shadow Grey / Panda — $119.99\n\n🛡️ 100% Try-Before-You-Pay Guarantee: Our courier will wait with you while you inspect the master-quality leather and try on the size before paying a single dollar! Which color do you prefer?',
-    delayMs: 2100,
-    highlightNote: 'Step 2: AI confirms size 43 availability, lists colors with prices, and eliminates buyer anxiety with courier inspection guarantee.',
+    text: 'وعليكم السلام ورحمة الله وبركاته! 👟🔥 منورنا يا فندم في HBB Store.\n\nأيوة متوفر نايكي دانك لو باندا (Nike Dunk Panda) مقاس 43 ماستر كواليتي هاي إند مع البوكس الأصلي بـ 1250 جنيه مصري فقط!\n\n🛡️ ضمان HBB الذهبي: المندوب بيفتح الكرتونة وتشوف الجلد والنعل وتقيس الكوتشي براحتك قبل ما تدفع ولا مليم! تحب نجهزهولك؟',
+    delayMs: 4000,
+    highlightNote: 'الخطوة 2: البوت يؤكد توفر الكوتشي وسعره (1250 جنيه مصري) وميزة المعاينة قبل الدفع.',
     extractedDraft: {
-      items: [{ name: 'Air Jordan 1 Retro', sizeOrColor: 'Size 43', quantity: 1, price: 129.99 }],
+      items: [{ name: 'سنيكرز نايكي دانك باندا', sizeOrColor: 'مقاس 43 / أبيض × أسود', quantity: 1, price: 1250 }],
       status: 'collecting',
     },
   },
   {
     sender: 'user',
-    text: 'I want the Chicago Classic in size 43. Deliver to: 120 Broadway St, New York, Apt 8B. Name: Tarek Zaki, phone +1 555 987 6543.',
-    delayMs: 1700,
-    highlightNote: 'Step 3: Customer selects Chicago edition and provides delivery address.',
+    text: 'طب التلبيس بتاعه مظبوط ولا بياخد نمرة أكبر؟ وعايز اعرف الشحن لمدينة نصر كام؟',
+    delayMs: 3000,
+    highlightNote: 'الخطوة 3: استفسار عن دقة مقاسات الكوتشيات وتكلفة شحن مدينة نصر.',
+  },
+  {
+    sender: 'model',
+    text: 'تلبيس المقاسات مظبوط ومريح جداً True to Size بنعل طري ومريح للمشي والجامعة. ولو حبيت تقيس مقاس 43 ومقاس 44 مع المندوب متاح نبعتلك المقاسين للمعاينة! 👟✨\n\n🛵 الشحن لمدينة نصر: 45 جنيه مصري والتوصيل خلال 24 ساعة.\n💰 الإجمالي: 1250 + 45 = 1295 جنيه مصري.\n\nتحب نثبت حجز مقاس 43 باسم مين وعنوان إيه؟',
+    delayMs: 4000,
+    highlightNote: 'الخطوة 4: البوت يوضح ميزة إرسال مقاسين للمعاينة ويحسب إجمالي السعر بالجنيه المصري.',
+  },
+  {
+    sender: 'user',
+    text: 'حلو أوي العرض ده! اعتمد مقاس 43. الاسم: كريم سامي، العنوان: مدينة نصر - مكرم عبيد شارع هشام لبيب عمارة 8، التليفون: 01122334455، دفع عند الاستلام.',
+    delayMs: 3500,
+    highlightNote: 'الخطوة 5: العميل يؤكد الحجز والاسم والعنوان وطريقة الدفع.',
     extractedDraft: {
-      items: [{ name: 'Air Jordan 1 Retro (Chicago Red/White)', sizeOrColor: 'Size 43', quantity: 1, price: 129.99 }],
-      address: '120 Broadway St, New York, Apt 8B',
-      paymentMethod: 'Cash on Delivery after Inspection',
-      prepTime: 'Dispatches today (Delivery in 24 hours)',
-      totalEstimated: 139.99, // 129.99 + 10.00 Express shipping
+      items: [{ name: 'سنيكرز نايكي دانك باندا', sizeOrColor: 'مقاس 43 / أبيض × أسود', quantity: 1, price: 1250 }],
+      address: 'القاهرة - مدينة نصر، مكرم عبيد شارع هشام لبيب عمارة 8',
+      paymentMethod: 'الدفع عند الاستلام بعد المعاينة والقياس',
+      prepTime: 'توصيل خلال 24 ساعة',
+      totalEstimated: 1295,
       status: 'confirmed',
     },
   },
   {
     sender: 'model',
-    text: 'Perfect choice, Tarek! 👟🔥 Air Jordan 1 Chicago in size 43 is booked under your name.\n\n📦 Order Details:\n• Air Jordan 1 High Chicago (Size 43 / US 9.5)\n• Subtotal: $129.99 + $10.00 Express Shipping = $139.99 Total\n• Delivery Address: 120 Broadway St, New York, Apt 8B\n• Courier Policy: Inspect and try on first!\n\nYour package dispatches today and will arrive within 24 hours. Thank you for shopping with HML!',
-    delayMs: 2200,
-    highlightNote: 'Step 4: POS draft extracted, customer details locked, shipping ticket generated.',
+    text: 'تم تأكيد حجز السنيكرز يا كابتن كريم! 👟🎉\n\n📦 الكوتشي بالبوكس الأصلي محجوز باسمك وبيروح لشركة الشحن فوراً.\n💰 الإجمالي: 1295 جنيه مصري شامل الشحن والمعاينة والقياس مع المندوب.\n\n🚨 تم إرسال إشعار طلب فوري لرقم صاحب المحل الشخصي: +201132044823 للتنفيذ المباشر!',
+    delayMs: 4500,
+    highlightNote: 'الخطوة 6: إصدار تذكرة الحجز وإطلاق تنبيه الواتساب للتاجر فورياً.',
+    extractedDraft: {
+      items: [{ name: 'سنيكرز نايكي دانك باندا', sizeOrColor: 'مقاس 43 / أبيض × أسود', quantity: 1, price: 1250 }],
+      address: 'القاهرة - مدينة نصر، مكرم عبيد شارع هشام لبيب عمارة 8',
+      paymentMethod: 'الدفع عند الاستلام بعد المعاينة والقياس',
+      prepTime: 'توصيل خلال 24 ساعة',
+      totalEstimated: 1295,
+      status: 'confirmed',
+    },
   },
 ];
 
 export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, onClose }) => {
-  const [selectedTrack, setSelectedTrack] = useState<'pizza' | 'sneakers'>('pizza');
+  const [selectedTrack, setSelectedTrack] = useState<'hoodies' | 'sneakers'>('hoodies');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [isPlaying, setIsPlaying] = useState<boolean>(true);
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(1);
@@ -161,123 +200,175 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
   const [typingText, setTypingText] = useState<string>('');
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [currentDraft, setCurrentDraft] = useState<any>(null);
+  const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<any>(null);
+  const elapsedTimerRef = useRef<any>(null);
 
-  const steps = selectedTrack === 'pizza' ? PIZZA_TOUR_STEPS : SNEAKERS_TOUR_STEPS;
+  const steps = selectedTrack === 'hoodies' ? HOODIE_TOUR_STEPS : SNEAKERS_TOUR_STEPS;
+  const estimatedTotalSeconds = Math.round(70 / speedMultiplier);
 
-  // Reset and restart tour
   const restartTour = (track = selectedTrack) => {
     if (timerRef.current) clearTimeout(timerRef.current);
+    if (elapsedTimerRef.current) clearInterval(elapsedTimerRef.current);
     setSelectedTrack(track);
     setCurrentStepIndex(0);
     setDisplayedMessages([]);
     setTypingText('');
     setIsTyping(false);
     setCurrentDraft(null);
+    setElapsedSeconds(0);
     setIsPlaying(true);
   };
 
   useEffect(() => {
-    if (isOpen) {
-      restartTour();
-    } else {
+    if (!isOpen) {
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (elapsedTimerRef.current) clearInterval(elapsedTimerRef.current);
+      return;
     }
+
+    restartTour(selectedTrack);
+
+    elapsedTimerRef.current = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      if (elapsedTimerRef.current) clearInterval(elapsedTimerRef.current);
+    };
   }, [isOpen]);
 
-  // Main step-by-step playback engine
+  // Handle ESC key press to close modal immediately
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [displayedMessages, typingText]);
+
   useEffect(() => {
     if (!isOpen || !isPlaying) return;
 
     if (currentStepIndex >= steps.length) {
-      // Finished all steps
       setIsPlaying(false);
       return;
     }
 
     const currentStep = steps[currentStepIndex];
-    const fullText = currentStep.text;
-    const isUser = currentStep.sender === 'user';
+    const typingDuration = Math.min(1800, currentStep.text.length * 20) / speedMultiplier;
+    const adjustedStepDelay = currentStep.delayMs / speedMultiplier;
 
-    // Simulate typing effect
     setIsTyping(true);
     let charIndex = 0;
-    const typingIntervalMs = (isUser ? 25 : 12) / speedMultiplier;
+    const fullText = currentStep.text;
+    const charInterval = typingDuration / Math.max(1, fullText.length);
 
-    const charTimer = setInterval(() => {
+    const typeTimer = setInterval(() => {
       charIndex += 2;
+      setTypingText(fullText.slice(0, charIndex));
       if (charIndex >= fullText.length) {
-        clearInterval(charTimer);
+        clearInterval(typeTimer);
         setIsTyping(false);
+
+        setDisplayedMessages((prev) => [
+          ...prev,
+          { sender: currentStep.sender, text: currentStep.text },
+        ]);
         setTypingText('');
-        setDisplayedMessages((prev) => [...prev, { sender: currentStep.sender, text: fullText }]);
 
         if (currentStep.extractedDraft) {
           setCurrentDraft(currentStep.extractedDraft);
         }
 
-        // Wait before advancing to next step
-        const pauseDelay = currentStep.delayMs / speedMultiplier;
         timerRef.current = setTimeout(() => {
           setCurrentStepIndex((prev) => prev + 1);
-        }, pauseDelay);
-      } else {
-        setTypingText(fullText.slice(0, charIndex));
+        }, adjustedStepDelay);
       }
-    }, typingIntervalMs);
+    }, Math.max(15, charInterval));
 
     return () => {
-      clearInterval(charTimer);
+      clearInterval(typeTimer);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [currentStepIndex, isPlaying, isOpen, selectedTrack, speedMultiplier]);
 
-  // Auto-scroll chat
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [displayedMessages, typingText]);
-
   if (!isOpen) return null;
 
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl w-full max-w-5xl shadow-2xl flex flex-col overflow-hidden max-h-[92vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-5 bg-slate-950/90 backdrop-blur-md animate-fadeIn"
+      dir="rtl"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      {/* Floating Immediate Exit Button - Always visible regardless of scrolling or iframe */}
+      <button
+        onClick={onClose}
+        className="fixed top-3 left-3 sm:top-5 sm:left-5 z-[999999] px-4 py-2 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow-2xl shadow-rose-950/90 border-2 border-white/90 cursor-pointer active:scale-95 transition-all hover:scale-105"
+        title="اضغط للخروج فوراً من الديمو والرجوع للبرنامج (أو اضغط زرار Esc)"
+      >
+        <X className="w-5 h-5 text-white stroke-[3]" />
+        <span>خروج من الديمو ❌</span>
+      </button>
+
+      <div className="relative w-full max-w-6xl bg-slate-900 border border-emerald-500/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh]">
         {/* Top Header Bar */}
-        <div className="bg-slate-950 px-6 py-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="bg-slate-950 px-4 sm:px-6 py-3.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-lg shadow-emerald-950/50 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-950 shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white tracking-tight">
-                  Raddad AI Engine — Interactive Auto-Play Tour
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-bold text-white text-sm sm:text-base">
+                  العرض التجريبي التفاعلي الحي: متجر HBB Store
                 </h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40">
-                  Self-Running Sandbox
+                <span className="text-[10px] sm:text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
+                  بالجنيه المصري (EGP) حصراً
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
-                Experience simulated customer conversations and instant POS order drafting with zero configuration.
+              <p className="text-[11px] sm:text-xs text-slate-400">
+                محاكاة حية بالعامية المصرية: تفاوض بيعي ذكي، ترشيح مقاسات، وتأكيد أوردر مع إشعار التاجر فورياً.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Track Switcher */}
             <div className="bg-slate-900 p-1 rounded-xl border border-slate-800 flex items-center gap-1 text-xs">
               <button
-                onClick={() => restartTour('pizza')}
+                onClick={() => restartTour('hoodies')}
                 className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 font-medium transition cursor-pointer ${
-                  selectedTrack === 'pizza'
-                    ? 'bg-amber-600 text-white shadow-sm font-bold'
+                  selectedTrack === 'hoodies'
+                    ? 'bg-emerald-600 text-white shadow-sm font-bold'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Utensils className="w-3.5 h-3.5" />
-                <span>Pizza & Food (F&B)</span>
+                <Shirt className="w-3.5 h-3.5" />
+                <span>هودي وكارغو</span>
               </button>
               <button
                 onClick={() => restartTour('sneakers')}
@@ -288,59 +379,31 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                 }`}
               >
                 <Footprints className="w-3.5 h-3.5" />
-                <span>Sneakers (Retail)</span>
+                <span>نايكي دانك</span>
               </button>
             </div>
 
+            {/* High Visibility Exit Button */}
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
-              title="Close Tour"
+              className="px-3.5 py-1.5 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-white font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-lg shadow-rose-950/60 active:scale-95 border border-rose-500"
+              title="إغلاق العرض والرجوع للوحة التحكم (Esc)"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
+              <span>خروج من الديمو (Esc)</span>
             </button>
           </div>
         </div>
 
-        {/* Dynamic Top Progress Bar */}
+        {/* Progress Bar */}
         <div className="w-full bg-slate-950 h-1.5 relative overflow-hidden">
           <div
-            className="bg-gradient-to-r from-amber-500 via-emerald-400 to-teal-400 h-full transition-all duration-300 shadow-sm"
+            className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-300 shadow-sm"
             style={{ width: `${Math.min(100, Math.round(((currentStepIndex + (isTyping ? 0.5 : 1)) / steps.length) * 100))}%` }}
           />
         </div>
 
-        {/* Step Navigation Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-2 px-6 bg-slate-950/80 border-b border-slate-800/80 text-[11px]">
-          <span className="text-slate-500 font-semibold uppercase text-[10px] tracking-wider mr-1 shrink-0">
-            Tour Milestones:
-          </span>
-          {steps.map((s, idx) => {
-            const isCurrent = idx === currentStepIndex;
-            const isCompleted = idx < currentStepIndex;
-            return (
-              <button
-                key={idx}
-                onClick={() => {
-                  setCurrentStepIndex(idx);
-                  setDisplayedMessages(steps.slice(0, idx).map((st) => ({ sender: st.sender, text: st.text })));
-                  if (steps[idx]?.extractedDraft) setCurrentDraft(steps[idx].extractedDraft);
-                }}
-                className={`px-2.5 py-1 rounded-lg shrink-0 transition font-medium cursor-pointer ${
-                  isCurrent
-                    ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-950/40 ring-1 ring-emerald-300'
-                    : isCompleted
-                      ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                }`}
-              >
-                {idx + 1}. {idx === 0 ? 'Inquiry' : idx === 1 ? 'Combos & Tiers' : idx === 2 ? 'Upselling Add-ons' : idx === 3 ? 'Cooking Notes' : idx === 4 ? 'Address & ETA' : 'Confirmed'}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Playback Controls & Tour Progress Indicator */}
+        {/* Playback Controls */}
         <div className="bg-slate-950/70 px-6 py-2.5 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-3">
             <button
@@ -348,7 +411,7 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
               className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-sm"
             >
               {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-              <span>{isPlaying ? 'Pause' : 'Play Tour'}</span>
+              <span>{isPlaying ? 'إيقاف مؤقت' : 'تشغيل العرض'}</span>
             </button>
 
             <button
@@ -356,61 +419,66 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
               className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1.5 transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Restart</span>
+              <span>إعادة البدء</span>
             </button>
 
             <button
               onClick={() => setSpeedMultiplier((prev) => (prev === 1 ? 1.5 : prev === 1.5 ? 2 : 1))}
               className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono flex items-center gap-1 transition cursor-pointer"
-              title="Toggle playback speed"
+              title="تغيير سرعة العرض"
             >
               <FastForward className="w-3.5 h-3.5 text-cyan-400" />
-              <span>{speedMultiplier}x Speed</span>
+              <span>{speedMultiplier}x السرعة</span>
             </button>
+
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 font-mono text-[11px]">
+              <Timer className="w-3.5 h-3.5 text-amber-400" />
+              <span>
+                {formatTime(elapsedSeconds)} / {formatTime(estimatedTotalSeconds)} دقيقة
+              </span>
+            </div>
           </div>
 
-          {/* Current Step Highlight */}
           <div className="flex items-center gap-2">
-            <span className="text-slate-400">Step:</span>
+            <span className="text-slate-400">الخطوة:</span>
             <span className="font-bold text-white">
-              {Math.min(currentStepIndex + 1, steps.length)} of {steps.length}
+              {Math.min(currentStepIndex + 1, steps.length)} من {steps.length}
             </span>
             <div className="hidden md:block text-slate-400 max-w-md truncate bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
-              <strong className="text-emerald-400 mr-1.5">Focus:</strong>
+              <strong className="text-emerald-400 ml-1.5">الهدف:</strong>
               {steps[Math.min(currentStepIndex, steps.length - 1)]?.highlightNote}
             </div>
           </div>
         </div>
 
-        {/* Main Body: 2-Column Split Layout */}
+        {/* 2-Column Split Layout */}
         <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden min-h-[480px]">
-          {/* Left Column: WhatsApp Simulator Chat Mockup (7 cols) */}
-          <div className="lg:col-span-7 bg-[#0b141a] flex flex-col border-r border-slate-800 relative">
-            {/* Chat Header */}
+          {/* Chat Mockup (7 cols) */}
+          <div className="lg:col-span-7 bg-[#0b141a] flex flex-col border-l border-slate-800 relative" dir="rtl">
             <div className="bg-[#1f2c34] text-white px-4 py-3 flex items-center justify-between border-b border-slate-700/60 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white shadow text-base">
-                  {selectedTrack === 'pizza' ? '🍕' : '👟'}
+                  👕
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm leading-tight text-slate-100">
-                    {selectedTrack === 'pizza' ? 'Bella Roma Pizza & Pastas' : 'HML Sneakers & Footwear'}
+                    HBB Store (الخط الرسمي)
                   </h4>
                   <span className="text-xs text-emerald-400 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span>Active • Gemini 3.8 Flash Engine</span>
+                    <span>نشط الآن • ذكاء اصطناعي بالعامية المصرية (EGP)</span>
                   </span>
                 </div>
               </div>
 
-              <div className="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded-md">
+              <div className="text-xs font-mono text-slate-400 bg-slate-800 px-2.5 py-1 rounded-md" dir="ltr">
                 +20 113 204 4823
               </div>
             </div>
 
-            {/* Chat Messages Body */}
+            {/* Chat Messages */}
             <div
-              className="flex-1 overflow-y-auto p-4 space-y-3"
+              className="flex-1 overflow-y-auto p-4 space-y-3.5"
               style={{
                 backgroundImage:
                   'radial-gradient(#1e293b 1px, transparent 1px), radial-gradient(#1e293b 1px, #0b141a 1px)',
@@ -422,15 +490,15 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                 return (
                   <div key={idx} className={`flex ${isUser ? 'justify-start' : 'justify-end'}`}>
                     <div
-                      className={`max-w-[82%] rounded-2xl px-3.5 py-2 text-xs shadow-md leading-relaxed whitespace-pre-wrap ${
+                      className={`max-w-[84%] rounded-2xl px-3.5 py-2.5 text-xs shadow-md leading-relaxed whitespace-pre-wrap ${
                         isUser
-                          ? 'bg-[#202c33] text-slate-100 rounded-bl-xs border border-slate-700/40'
-                          : 'bg-[#005c4b] text-white rounded-br-xs'
+                          ? 'bg-[#202c33] text-slate-100 rounded-br-xs border border-slate-700/40'
+                          : 'bg-[#005c4b] text-white rounded-bl-xs'
                       }`}
                     >
                       <div className="flex items-center gap-1.5 mb-1 opacity-70 text-[10px]">
                         {isUser ? <User className="w-3 h-3" /> : <Bot className="w-3 h-3" />}
-                        <span>{isUser ? 'Customer' : 'Raddad AI Assistant'}</span>
+                        <span>{isUser ? 'العميل' : 'مساعد HBB Store الذكي'}</span>
                       </div>
                       {msg.text}
                     </div>
@@ -438,7 +506,6 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                 );
               })}
 
-              {/* In-Progress Live Typing Bubble */}
               {isTyping && (
                 <div
                   className={`flex ${
@@ -446,10 +513,10 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                   }`}
                 >
                   <div
-                    className={`max-w-[82%] rounded-2xl px-3.5 py-2 text-xs shadow-md leading-relaxed whitespace-pre-wrap animate-pulse ${
+                    className={`max-w-[84%] rounded-2xl px-3.5 py-2.5 text-xs shadow-md leading-relaxed whitespace-pre-wrap animate-pulse ${
                       steps[currentStepIndex]?.sender === 'user'
-                        ? 'bg-[#202c33] text-slate-100 rounded-bl-xs border border-slate-700/40'
-                        : 'bg-[#005c4b] text-white rounded-br-xs'
+                        ? 'bg-[#202c33] text-slate-100 rounded-br-xs border border-slate-700/40'
+                        : 'bg-[#005c4b] text-white rounded-bl-xs'
                     }`}
                   >
                     <div className="flex items-center gap-1.5 mb-1 opacity-70 text-[10px]">
@@ -459,11 +526,11 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                         <Bot className="w-3 h-3" />
                       )}
                       <span>
-                        {steps[currentStepIndex]?.sender === 'user' ? 'Customer typing...' : 'AI thinking...'}
+                        {steps[currentStepIndex]?.sender === 'user' ? 'العميل يكتب...' : 'الذكاء الاصطناعي يحلل الكتالوج ويرد...'}
                       </span>
                     </div>
                     {typingText}
-                    <span className="inline-block w-1.5 h-3 ml-0.5 bg-emerald-400 animate-ping" />
+                    <span className="inline-block w-1.5 h-3 mr-0.5 bg-emerald-400 animate-ping" />
                   </div>
                 </div>
               )}
@@ -471,41 +538,46 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Chat Bottom Footer Notification */}
             <div className="bg-[#1f2c34] px-4 py-2 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between shrink-0">
               <span className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span>Simulated in-memory sandbox session</span>
+                <span>بيئة تجريبية تفاعلية • بدون استهلاك رصيد WhatsApp حقيقي</span>
               </span>
-              <span className="font-mono text-emerald-400">Latency: 280ms</span>
+              <span className="font-mono text-emerald-400">زمن الاستجابة: 240ms</span>
             </div>
           </div>
 
-          {/* Right Column: Real-Time POS Draft & Extracted Order Card (5 cols) */}
-          <div className="lg:col-span-5 bg-slate-950 p-5 flex flex-col justify-between overflow-y-auto space-y-4">
+          {/* POS & Order Extraction Card (5 cols) */}
+          <div className="lg:col-span-5 bg-slate-950 p-5 flex flex-col justify-between overflow-y-auto space-y-4" dir="rtl">
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <h4 className="text-sm font-bold text-white flex items-center gap-2">
                   <ShoppingBag className="w-4 h-4 text-emerald-400" />
-                  <span>Real-Time POS Draft Extractor</span>
+                  <span>تذكرة تفاصيل الطلب واستخراج البيانات (POS)</span>
                 </h4>
                 {currentDraft?.status && (
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                       currentDraft.status === 'confirmed'
-                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40'
-                        : 'bg-amber-950 text-amber-300 border border-amber-500/40'
+                        ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/40 animate-pulse'
+                        : currentDraft.status === 'ready_to_confirm'
+                          ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40'
+                          : 'bg-amber-950 text-amber-300 border border-amber-500/40'
                     }`}
                   >
-                    {currentDraft.status === 'confirmed' ? '✓ Order Confirmed' : '⚡ Extracting Draft'}
+                    {currentDraft.status === 'confirmed'
+                      ? '✓ تم تأكيد الحجز وإشعار التاجر'
+                      : currentDraft.status === 'ready_to_confirm'
+                        ? '⚡ جاهز للتأكيد النهائي'
+                        : '⚡ جاري استخراج البيانات'}
                   </span>
                 )}
               </div>
 
-              {/* Order Items Table */}
+              {/* Items Table */}
               <div className="space-y-2">
                 <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block">
-                  Detected Line Items & Modifiers:
+                  المنتجات المحددة من المحادثة:
                 </span>
                 {currentDraft?.items && currentDraft.items.length > 0 ? (
                   <div className="space-y-2">
@@ -519,25 +591,25 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                           <span className="text-[11px] text-slate-400">{item.sizeOrColor}</span>
                         </div>
                         <span className="font-mono text-emerald-400 font-bold">
-                          {item.quantity} × ${Number(item.price).toFixed(2)}
+                          {item.quantity} × {item.price} ج.م
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <div className="bg-slate-900/50 border border-dashed border-slate-800 rounded-xl p-6 text-center text-xs text-slate-500">
-                    Waiting for customer to specify dishes or items...
+                    في انتظار تحديد العميل للقطع والمقاسات من الكتالوج...
                   </div>
                 )}
               </div>
 
-              {/* Extracted Customer Meta Details */}
+              {/* Delivery & Payment Details */}
               {currentDraft?.address && (
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs space-y-2">
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3.5 text-xs space-y-2.5 shadow-sm">
                   <div className="flex items-start gap-2">
                     <MapPin className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-slate-400 block text-[10px] uppercase font-bold">Delivery Address:</span>
+                      <span className="text-slate-400 block text-[10px] font-bold">عنوان الشحن المعتمد:</span>
                       <span className="text-white font-medium">{currentDraft.address}</span>
                     </div>
                   </div>
@@ -545,7 +617,7 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                   {currentDraft.paymentMethod && (
                     <div className="flex items-center gap-2 pt-1 border-t border-slate-800/80">
                       <CreditCard className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-                      <span className="text-slate-400 text-[11px]">Payment:</span>
+                      <span className="text-slate-400 text-[11px]">طريقة السداد:</span>
                       <span className="text-white font-medium text-[11px]">{currentDraft.paymentMethod}</span>
                     </div>
                   )}
@@ -553,41 +625,66 @@ export const AutoDemoTourModal: React.FC<AutoDemoTourModalProps> = ({ isOpen, on
                   {currentDraft.prepTime && (
                     <div className="flex items-center gap-2">
                       <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                      <span className="text-slate-400 text-[11px]">Kitchen Prep:</span>
+                      <span className="text-slate-400 text-[11px]">موعد الشحن والتوصيل:</span>
                       <span className="text-amber-300 font-medium text-[11px]">{currentDraft.prepTime}</span>
                     </div>
                   )}
                 </div>
               )}
 
-              {/* Total Calculation */}
+              {/* Total Price */}
               {currentDraft?.totalEstimated ? (
-                <div className="bg-gradient-to-r from-emerald-950/60 to-teal-950/60 border border-emerald-500/40 rounded-xl p-3.5 flex items-center justify-between text-xs">
+                <div className="bg-gradient-to-l from-emerald-950/60 to-teal-950/60 border border-emerald-500/40 rounded-xl p-3.5 flex items-center justify-between text-xs shadow-md">
                   <div>
-                    <span className="text-emerald-300 font-medium block">Total Order Value:</span>
-                    <span className="text-[10px] text-slate-400">Includes taxes & delivery</span>
+                    <span className="text-emerald-300 font-medium block">الإجمالي بالجنيه المصري:</span>
+                    <span className="text-[10px] text-slate-400">شامل مصاريف الشحن والمعاينة المجانية</span>
                   </div>
-                  <span className="text-lg font-bold font-mono text-emerald-300">
-                    ${Number(currentDraft.totalEstimated).toFixed(2)}
+                  <span className="text-xl font-bold font-mono text-emerald-300">
+                    {Math.round(currentDraft.totalEstimated)} جنيه مصري
                   </span>
                 </div>
               ) : null}
+
+              {/* Instant Alert Format Preview */}
+              {currentDraft?.status === 'confirmed' && (
+                <div className="bg-slate-900/90 border border-amber-500/40 rounded-xl p-3 text-xs space-y-1.5">
+                  <span className="text-amber-400 font-bold block text-[11px]">
+                    🚨 نص رسالة التنبيه المرسلة فوراً لموبايل صاحب المحل:
+                  </span>
+                  <div className="bg-slate-950 p-2.5 rounded-lg font-mono text-[11px] text-slate-300 leading-relaxed whitespace-pre-line border border-slate-800">
+                    {`🚨 طلب جديد محجوز عبر RADDAD AI!
+👤 العميل: أحمد محمود
+📞 رقم العميل: 01012345678
+📍 العنوان: ${currentDraft.address || 'القاهرة - المعادي شارع 9'}
+🛒 الطلبات: ${currentDraft.items?.map((it: any) => `${it.name} (${it.sizeOrColor})`).join(' + ')}
+💰 الإجمالي: ${Math.round(currentDraft.totalEstimated)} جنيه مصري`}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Bottom Callout & Live WhatsApp Link */}
+            {/* Bottom Callout */}
             <div className="pt-3 border-t border-slate-800 space-y-2">
               <a
-                href="https://wa.me/201132044823?text=Hi%2C%20I%20would%20like%20to%20test%20the%20Raddad%20WhatsApp%20AI%20sales%20agent%21"
+                href="https://wa.me/201132044823?text=%D9%85%D8%B3%D8%A7%D8%A1%20%D8%A7%D9%84%D8%AE%D9%8A%D8%B1%D8%8C%20%D8%B9%D8%A7%D9%8A%D8%B2%20%D8%A3%D8%AC%D8%B1%D8%A8%20%D8%A8%D9%88%D8%AA%20HBB%20Store%20%D8%B9%D9%84%D9%89%20%D9%88%D8%A7%D8%AA%D8%B3%D8%A7%D8%A8"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/50 transition cursor-pointer"
               >
                 <Smartphone className="w-4 h-4" />
-                <span>Test Live on WhatsApp (+20 113 204 4823)</span>
+                <span>تجربة حية على واتساب المحل (+20 113 204 4823)</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
+              <button
+                type="button"
+                onClick={onClose}
+                className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-xs flex items-center justify-center gap-2 border border-slate-700 transition cursor-pointer shadow-md"
+              >
+                <X className="w-4 h-4 text-rose-400" />
+                <span>إغلاق العرض التجريبي والرجوع للوحة التحكم (Esc)</span>
+              </button>
               <p className="text-[11px] text-slate-400 text-center">
-                Commercial Turn-Key SaaS • Ready for Acquire.com / Flippa Handover
+                نظام SaaS متكامل لإدارة مبيعات محلات الملابس والسنيكرز في مصر 🇪🇬
               </p>
             </div>
           </div>

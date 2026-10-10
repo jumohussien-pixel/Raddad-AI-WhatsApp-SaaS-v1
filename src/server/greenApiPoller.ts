@@ -9,18 +9,20 @@ import {
   DEFAULT_GREEN_API_TOKEN,
   DEFAULT_GREEN_API_HOST,
   resolveGreenApiHost,
-} from './webhookHandler.js';
-import { memoryManager } from './memoryManager.js';
-import { generateSalesResponse } from './geminiService.js';
-import { sendOutboundWhatsAppMessage } from './webhookHandler.js';
-import { logWebhookEvent } from './telemetry.js';
+  sendOutboundWhatsAppMessage,
+} from './webhookHandler.ts';
+import { memoryManager } from './memoryManager.ts';
+import { generateSalesResponse, extractOrderDetails, type MediaOptions } from './geminiService.ts';
+import { orderManager } from './orderManager.ts';
+import { logWebhookEvent } from './telemetry.ts';
 import {
   isReplayAttack,
   isRateLimited,
   inspectSecurityThreats,
   sanitizeOutboundMessage,
-} from './securityShield.js';
-import { concurrencyManager } from './concurrencyManager.js';
+} from './securityShield.ts';
+import { concurrencyManager } from './concurrencyManager.ts';
+import { storeRegistry } from './storeRegistry.ts';
 
 const CONFIG_FILE = path.join(process.cwd(), 'data', 'whatsapp-config.json');
 
@@ -33,6 +35,10 @@ interface GreenConfig {
 let isPollingRunning = false;
 let pollingInterval: NodeJS.Timeout | null = null;
 let consecutiveErrors = 0;
+let lastHistoryScanTime = 0;
+
+// Set of already processed message IDs to prevent duplicates
+const processedMessageIds = new Set<string>();
 
 function getStoredGreenConfig(): GreenConfig {
   let instanceId = whatsappRuntimeConfig.greenApi.instanceId || process.env.GREEN_API_INSTANCE_ID || DEFAULT_GREEN_API_INSTANCE_ID;
@@ -54,6 +60,122 @@ function getStoredGreenConfig(): GreenConfig {
 }
 
 /**
+ * Handles a single validated incoming message payload
+ */
+async function processIncomingChatMessage(
+  messageId: string,
+  fromPhone: string,
+  text: string,
+  mediaOptions?: MediaOptions,
+  rawBody?: any
+): Promise<boolean> {
+  if (processedMessageIds.has(messageId)) {
+    return false;
+  }
+  processedMessageIds.add(messageId);
+  // Keep cache bounded
+  if (processedMessageIds.size > 2000) {
+    const oldest = Array.from(processedMessageIds).slice(0, 500);
+    oldest.forEach((id) => processedMessageIds.delete(id));
+  }
+
+  const startTime = Date.now();
+
+  // 1. Anti-Replay Check
+  if (isReplayAttack(messageId)) {
+    console.warn(`[GreenApiPoller] 🛡️ Ignored duplicate/replay message ID: ${messageId}`);
+    return false;
+  }
+
+  // 2. Token Bucket Rate Limiter
+  const rateCheck = isRateLimited(fromPhone);
+  if (rateCheck.limited) {
+    const rateReply = 'One moment please! We are preparing your request and will reply right away to give you the best experience! 🌸';
+    await sendOutboundWhatsAppMessage(fromPhone, rateReply, 'green_api');
+    return true;
+  }
+
+  // 3. Concurrency Manager Execution with Per-Phone Mutex
+  await concurrencyManager.execute(fromPhone, async () => {
+    console.log(`[GreenApiPoller] 💬 Processing incoming message from ${fromPhone}: "${text}"`);
+
+    // Check Human Takeover Mode
+    if (memoryManager.isHumanTakeover(fromPhone)) {
+      console.log(`[GreenApiPoller] 👨‍💼 Human Takeover ACTIVE for +${fromPhone}. Bot response suppressed to avoid conflict.`);
+      await memoryManager.addMessage(fromPhone, 'user', text);
+      return;
+    }
+
+    // 4. Prompt Injection & Adversarial Payload Inspection
+    const threatCheck = inspectSecurityThreats(text, fromPhone);
+    let aiReply = '';
+
+    const activeStore = storeRegistry.getActiveStore();
+    const currentStoreId = 'hbb';
+    const currentCategory: 'clothing' | 'sneakers' = 'clothing';
+
+    if (threatCheck.isThreat && threatCheck.safeReplacement) {
+      aiReply = threatCheck.safeReplacement;
+    } else {
+      await memoryManager.getSession(fromPhone, currentCategory, currentStoreId);
+      const history = await memoryManager.getHistory(fromPhone);
+
+      aiReply = await generateSalesResponse(
+        text,
+        history,
+        currentCategory,
+        mediaOptions,
+        currentStoreId
+      );
+
+      const userRecordedText = mediaOptions?.transcription
+        ? `🎙️ [تسجيل صوتي من العميل]: "${mediaOptions.transcription}"`
+        : text;
+
+      await memoryManager.addMessage(fromPhone, 'user', userRecordedText);
+      await memoryManager.addMessage(fromPhone, 'model', aiReply);
+
+      // Asynchronously extract and register confirmed orders
+      if (!memoryManager.isOrderRecentlyConfirmed(fromPhone)) {
+        extractOrderDetails(history, currentCategory).then(async (draft) => {
+          if (draft && draft.items && draft.items.length > 0 && (draft.customerName || draft.customer_name || draft.address || draft.delivery_address || draft.deliveryAddress || draft.status === 'confirmed')) {
+            await memoryManager.updateOrderDraft(fromPhone, draft);
+            const created = await orderManager.createOrderFromDraft(draft, activeStore, fromPhone, text);
+            memoryManager.markOrderConfirmed(fromPhone, created.orderNumber);
+            console.log(`[GreenApiPoller] 📦 Order captured & merchant notified for +${fromPhone}:`, draft.customerName || draft.customer_name);
+          }
+        }).catch((e) => console.warn('[GreenApiPoller] Order extraction check warning:', e.message));
+      }
+    }
+
+    // 5. Outbound Secret & Exfiltration Firewall
+    const safeOutbound = sanitizeOutboundMessage(aiReply);
+    const finalOutbound =
+      mediaOptions?.transcription && !safeOutbound.includes(mediaOptions.transcription)
+        ? `🎙️ سمعت تسجيلك الصوتي: "${mediaOptions.transcription}"\n\n${safeOutbound}`
+        : safeOutbound;
+
+    // 6. Send Outbound WhatsApp Message
+    const sendResult = await sendOutboundWhatsAppMessage(fromPhone, finalOutbound, 'green_api');
+    console.log(`[GreenApiPoller] 🚀 Outbound reply dispatched to ${fromPhone}. Success: ${sendResult.success}`);
+
+    logWebhookEvent({
+      method: 'POLL',
+      provider: 'green_api',
+      fromPhone,
+      userMessage: mediaOptions?.transcription || text,
+      botReply: finalOutbound,
+      status: sendResult.success ? 'processed' : 'error',
+      rawBody,
+      error: sendResult.error,
+      durationMs: Date.now() - startTime,
+    });
+  });
+
+  return true;
+}
+
+/**
  * Polls Green API receiveNotification queue once and processes any pending message
  */
 export async function pollOnce(): Promise<{ handled: boolean; message?: string }> {
@@ -63,114 +185,88 @@ export async function pollOnce(): Promise<{ handled: boolean; message?: string }
       return { handled: false, message: 'Green API is not configured' };
     }
 
-  const candidateHosts = resolveGreenApiHost(config.instanceId, config.host);
-  let res: any = null;
-  let activeHost = candidateHosts[0];
+    const candidateHosts = resolveGreenApiHost(config.instanceId, config.host);
+    let res: any = null;
+    let activeHost = candidateHosts[0];
 
-  for (const host of candidateHosts) {
-    try {
-      const cleanHost = host.replace(/\/+$/, '');
-      const receiveUrl = `${cleanHost}/waInstance${config.instanceId}/receiveNotification/${config.apiToken}`;
-      res = await axios.get(receiveUrl, { timeout: 8000 });
-      activeHost = cleanHost;
-      break;
-    } catch (e: any) {
-      // try next host
-      continue;
-    }
-  }
-
-  if (!res) {
-    consecutiveErrors++;
-    return { handled: false, message: 'Unable to reach Green API hosts' };
-  }
-
-  consecutiveErrors = 0;
-
-  if (!res.data || !res.data.receiptId) {
-    return { handled: false, message: 'Queue is empty' };
-  }
-
-  const { receiptId, body } = res.data;
-  console.log(`[GreenApiPoller] 📥 Received notification receiptId: ${receiptId}, type: ${body?.typeWebhook}`);
-
-  // Delete notification right away to prevent double-processing
-  const deleteUrl = `${activeHost}/waInstance${config.instanceId}/deleteNotification/${config.apiToken}/${receiptId}`;
-  await axios.delete(deleteUrl).catch((err) => {
-    console.warn(`[GreenApiPoller] Failed to delete receiptId ${receiptId}:`, err.message);
-  });
-
-    if (body && body.typeWebhook === 'incomingMessageReceived') {
-      const messageId = body.idMessage;
-      // 1. Anti-Replay Attack Check
-      if (messageId && isReplayAttack(messageId)) {
-        console.warn(`[GreenApiPoller] 🛡️ Ignored duplicate/replay message ID: ${messageId}`);
-        return { handled: true, message: 'Ignored duplicate replay attack' };
+    for (const host of candidateHosts) {
+      try {
+        const cleanHost = host.replace(/\/+$/, '');
+        // Explicit receiveTimeout=5 avoids long 20s blocking and avoids axios timeout errors
+        const receiveUrl = `${cleanHost}/waInstance${config.instanceId}/receiveNotification/${config.apiToken}?receiveTimeout=5`;
+        res = await axios.get(receiveUrl, { timeout: 10000 });
+        activeHost = cleanHost;
+        break;
+      } catch (e: any) {
+        continue;
       }
+    }
 
-      const parseResult = parseIncomingWebhook(body, { businessType: 'clothing' });
-      if (parseResult.isMessage && parseResult.message) {
-        const { fromPhone, text, provider, mediaType, mediaUrl, mimeType, caption } = parseResult.message;
-        const startTime = Date.now();
+    if (!res) {
+      consecutiveErrors++;
+      return { handled: false, message: 'Unable to reach Green API hosts' };
+    }
 
-        // 2. Token Bucket Rate Limiter per Phone Number
-        const rateCheck = isRateLimited(fromPhone);
-        if (rateCheck.limited) {
-          const rateReply = 'One moment please! We are preparing your request and will reply right away to give you the best experience! 🌸';
-          await sendOutboundWhatsAppMessage(fromPhone, rateReply, provider);
-          return { handled: true, message: `Rate-limited ${fromPhone}` };
-        }
+    consecutiveErrors = 0;
 
-        // 3. Concurrency Manager Execution with Per-Phone Mutex
-        await concurrencyManager.execute(fromPhone, async () => {
-          console.log(`[GreenApiPoller] 💬 Processing incoming message from ${fromPhone}: "${text}" (media: ${mediaType || 'none'})`);
+    // Check if notification arrived in queue
+    if (res.data && res.data.receiptId) {
+      const { receiptId, body } = res.data;
+      console.log(`[GreenApiPoller] 📥 Received notification receiptId: ${receiptId}, type: ${body?.typeWebhook}`);
 
-          // 4. Prompt Injection & Adversarial Payload Inspection
-          const threatCheck = inspectSecurityThreats(text, fromPhone);
-          let aiReply = '';
+      // Delete notification right away to prevent double-processing
+      const deleteUrl = `${activeHost}/waInstance${config.instanceId}/deleteNotification/${config.apiToken}/${receiptId}`;
+      await axios.delete(deleteUrl).catch((err) => {
+        console.warn(`[GreenApiPoller] Failed to delete receiptId ${receiptId}:`, err.message);
+      });
 
-          if (threatCheck.isThreat && threatCheck.safeReplacement) {
-            aiReply = threatCheck.safeReplacement;
-          } else {
-            // Normal conversation flow with 10-message memory
-            await memoryManager.getSession(fromPhone, 'clothing');
-            await memoryManager.addMessage(fromPhone, 'user', text);
-            const history = await memoryManager.getHistory(fromPhone);
-
-            aiReply = await generateSalesResponse(text, history, 'clothing', {
-              mediaType,
-              mediaUrl,
-              mimeType,
-              caption,
-            });
-            await memoryManager.addMessage(fromPhone, 'model', aiReply);
-          }
-
-          // 5. Outbound Secret & Exfiltration Firewall
-          const safeOutbound = sanitizeOutboundMessage(aiReply);
-
-          // 6. Send Outbound WhatsApp Message
-          const sendResult = await sendOutboundWhatsAppMessage(fromPhone, safeOutbound, provider);
-          console.log(`[GreenApiPoller] 🚀 Outbound reply dispatched to ${fromPhone}. Success: ${sendResult.success}`);
-
-          logWebhookEvent({
-            method: 'POLL',
-            provider: 'green_api',
+      if (body && body.typeWebhook === 'incomingMessageReceived') {
+        const messageId = body.idMessage || `green_${Date.now()}`;
+        const parseResult = parseIncomingWebhook(body);
+        if (parseResult.isMessage && parseResult.message) {
+          const { fromPhone, text, mediaType, mediaUrl, mimeType, caption } = parseResult.message;
+          await processIncomingChatMessage(
+            messageId,
             fromPhone,
-            userMessage: text,
-            botReply: safeOutbound,
-            status: sendResult.success ? 'processed' : 'error',
-            rawBody: body,
-            error: sendResult.error,
-            durationMs: Date.now() - startTime,
-          });
-        });
+            text,
+            { mediaType, mediaUrl, mimeType, caption },
+            body
+          );
+          return { handled: true, message: `Replied to ${fromPhone}` };
+        }
+      }
 
-        return { handled: true, message: `Replied to ${fromPhone}` };
+      return { handled: true, message: `Notification ${receiptId} processed` };
+    }
+
+    // Fallback: Check lastIncomingMessages every 10 seconds to catch any missed messages
+    const now = Date.now();
+    if (now - lastHistoryScanTime > 10000) {
+      lastHistoryScanTime = now;
+      try {
+        const historyUrl = `${activeHost}/waInstance${config.instanceId}/lastIncomingMessages/${config.apiToken}?minutes=5`;
+        const historyRes = await axios.get(historyUrl, { timeout: 8000 });
+        if (Array.isArray(historyRes.data)) {
+          for (const item of historyRes.data) {
+            const msgId = item.idMessage;
+            if (!msgId || processedMessageIds.has(msgId)) continue;
+
+            const sender = item.senderId || item.chatId || '';
+            const phone = cleanPhoneNumber(sender);
+            const text = item.textMessage || item.caption || '';
+            if (phone && text) {
+              console.log(`[GreenApiPoller] 🔎 Recovered incoming message from history scan: "${text}" from ${phone}`);
+              await processIncomingChatMessage(msgId, phone, text, undefined, item);
+              return { handled: true, message: `Recovered message from ${phone}` };
+            }
+          }
+        }
+      } catch (err: any) {
+        // history scan is optional fallback, ignore errors
       }
     }
 
-    return { handled: true, message: `Notification ${receiptId} processed` };
+    return { handled: false, message: 'Queue is empty' };
   } catch (err: any) {
     consecutiveErrors++;
     if (consecutiveErrors < 3) {

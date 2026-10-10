@@ -1,0 +1,186 @@
+[
+  {
+    "id": "ord_1791596850110_dc8g3",
+    "orderNumber": "#ORD-2360",
+    "storeId": "hbb",
+    "storeName": "Senior Test Streetwear Lab",
+    "customerName": "أحمد سمير",
+    "customerPhone": "201099887766",
+    "deliveryAddress": "القاهرة - مدينة نصر مكرم عبيد عمارة 14 الدور 3",
+    "items": [
+      {
+        "name": "هودي أوفر سايز",
+        "quantity": 1,
+        "price": 650,
+        "size": "L",
+        "color": "أسود",
+        "specialInstructions": ""
+      },
+      {
+        "name": "بنطلون كارغو",
+        "quantity": 1,
+        "price": 400,
+        "size": "34",
+        "color": "غير محدد",
+        "specialInstructions": ""
+      }
+    ],
+    "totalEstimated": 1050,
+    "currency": "EGP",
+    "paymentMethod": "الدفع عند الاستلام",
+    "status": "new",
+    "createdAt": 1791596850110
+  },
+  {
+    "id": "ord_1791596181733_25q6x",
+    "orderNumber": "#ORD-3477",
+    "storeId": "hbb",
+    "storeName": "HBB Store",
+    "customerName": "جمال حسين فتح الله",
+    "customerPhone": "20101948367",
+    "deliveryAddress": "49 أحمد الصاوي، شقة 12",
+    "items": [
+      {
+        "name": "هودي أوفر سايز ريفليكتف",
+        "quantity": 1,
+        "price": 650,
+        "size": "XL",
+        "color": "أسود فاحم",
+        "specialInstructions": ""
+      }
+    ],
+    "totalEstimated": 695,
+    "currency": "EGP",
+    "paymentMethod": "الدفع عند الاستلام",
+    "status": "new",
+    "createdAt": 1791596181733
+  },
+  {
+    "id": "ord_1791595888414_tms9z",
+    "orderNumber": "#ORD-4890",
+    "storeId": "hbb",
+    "storeName": "HBB Store",
+    "customerName": "عميل واتساب",
+    "customerPhone": "20101948367",
+    "deliveryAddress": "49 أحمد الصاوي، شقة 12",
+    "items": [
+      {
+        "name": "هودي أوفر سايز ريفليكتف",
+        "quantity": 1,
+        "price": 650,
+        "size": "XL",
+        "color": "أسود فاحم",
+        "specialInstructions": ""
+      }
+    ],
+    "totalEstimated": 695,
+    "currency": "EGP",
+    "paymentMethod": "الدفع عند الاستلام",
+    "status": "new",
+    "createdAt": 1791595888414
+  },
+  {
+    "id": "ord_1791595837340_l9c6e",
+    "orderNumber": "#ORD-7993",
+    "storeId": "hbb",
+    "storeName": "Senior Test Streetwear Lab",
+    "customerName": "أحمد سمير",
+    "customerPhone": "201099887766",
+    "deliveryAddress": "القاهرة - مدينة نصر مكرم عبيد عمارة 14 الدور 3",
+    "items": [
+      {
+        "name": "هودي أوفر سايز",
+        "quantity": 1,
+        "price": 650,
+        "size": "L",
+        "color": "أسود",
+        "specialInstructions": ""
+      },
+      {
+        "name": "بنطلون كارغو",
+        "quantity": 1,
+        "price": 400,
+        "size": "34",
+        "color": "غير محدد",
+        "specialInstructions": ""
+      }
+    ],
+    "totalEstimated": 1050,
+    "currency": "EGP",
+    "paymentMethod": "الدفع عند الاستلام",
+    "status": "new",
+    "createdAt": 1791595837340
+  },
+  {
+    "id": "ord_1791595385936_w7na6",
+    "orderNumber": "#ORD-3355",
+    "storeId": "hbb",
+    "storeName": "HBB Store",
+    "customerName": "عميل HBB Store",
+    "customerPhone": "20101948367",
+    "deliveryAddress": "العنوان مسجل هاتفياً",
+    "items": [
+      {
+        "name": "طلب ملابس شبابي من HBB Store",
+        "quantity": 1,
+        "price": 650,
+        "size": "L",
+        "color": "أسود",
+        "specialInstructions": ""
+      }
+    ],
+    "totalEstimated": 650,
+    "currency": "EGP",
+    "paymentMethod": "الدفع عند الاستلام (معاينة قبل الدفع)",
+    "status": "completed",
+    "createdAt": 1791595385936
+  },
+  {
+    "id": "ord_demo_01",
+    "orderNumber": "#ORD-1092",
+    "storeId": "hbb",
+    "storeName": "HBB Store",
+    "customerName": "أحمد محمود",
+    "customerPhone": "01001948367",
+    "deliveryAddress": "القاهرة - المعادي - شارع 9 عمارة 14 الدور 3",
+    "items": [
+      {
+        "name": "هودي أوفر سايز ريفليكتف",
+        "quantity": 1,
+        "price": 650,
+        "size": "XL",
+        "color": "أسود فاحم",
+        "specialInstructions": "معاينة وقياس مع المندوب قبل الدفع"
+      }
+    ],
+    "totalEstimated": 650,
+    "currency": "EGP",
+    "paymentMethod": "الدفع عند الاستلام (معاينة قبل الدفع)",
+    "status": "completed",
+    "createdAt": 1791302574507
+  },
+  {
+    "id": "ord_demo_02",
+    "orderNumber": "#ORD-1091",
+    "storeId": "hbb",
+    "storeName": "HBB Store",
+    "customerName": "محمد طارق",
+    "customerPhone": "01123456789",
+    "deliveryAddress": "الجيزة - الدقي - شارع مصدق",
+    "items": [
+      {
+        "name": "سنيكرز نايكي دانك لو باندا",
+        "quantity": 1,
+        "price": 1250,
+        "size": "43",
+        "color": "أبيض × أسود (Panda)",
+        "specialInstructions": "معاينة وتجربة مقاس 43 مع المندوب"
+      }
+    ],
+    "totalEstimated": 1250,
+    "currency": "EGP",
+    "paymentMethod": "الدفع عند الاستلام (معاينة قبل الدفع)",
+    "status": "completed",
+    "createdAt": 1791293274507
+  }
+]

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090D16" />
+      <stop offset="100%" stop-color="#042F2E" />
+    </linearGradient>
+    <linearGradient id="waGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#25D366" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="180" fill="url(#waGreen)" opacity="0.15" />
+  <g transform="translate(106, 106) scale(0.585)">
+    <!-- WhatsApp bubble icon with AI spark -->
+    <path fill="url(#waGreen)" d="M260.6 61.2C149.8 61.2 60 151 60 261.8c0 38.6 11 76.2 32 108.8L53 502l136-35.6c31.4 17.2 67 26.2 103.6 26.2h.2c110.8 0 200.6-89.8 200.6-200.6 0-53.6-20.8-104-58.6-141.8-37.8-38-88.2-59-142.2-59z"/>
+    <path fill="#ffffff" d="M380 326.6c-5.4-2.8-32-15.8-37-17.6-5-1.8-8.6-2.8-12.2 2.8-3.6 5.4-14 17.6-17.2 21.2-3.2 3.6-6.4 4-11.8 1.4-5.4-2.8-22.8-8.4-43.4-26.8-16-14.2-26.8-31.8-30-37.2-3.2-5.4-.4-8.4 2.4-11 2.4-2.4 5.4-6.4 8.2-9.6 2.8-3.2 3.6-5.4 5.4-9 1.8-3.6.8-6.8-.6-9.6-1.4-2.8-12.2-29.4-16.8-40.2-4.4-10.6-9-9.2-12.2-9.4-3.2-.2-6.8-.2-10.4-.2s-9.6 1.4-14.6 6.8c-5 5.4-19.2 18.8-19.2 45.8s19.6 53.2 22.4 56.8c2.8 3.6 38.6 59 93.6 82.6 13 5.6 23.2 9 31.2 11.6 13.2 4.2 25.2 3.6 34.6 2.2 10.6-1.6 32-13.2 36.6-25.8 4.6-12.6 4.6-23.4 3.2-25.8-1.4-2.2-5-3.6-10.4-6.4z"/>
+    <!-- Robot antenna / crown dot -->
+    <circle cx="260" cy="180" r="16" fill="#FDE047" />
+  </g>
+  <text x="256" y="445" font-family="system-ui, sans-serif" font-size="44" font-weight="900" fill="#E2E8F0" text-anchor="middle" letter-spacing="2">RADDAD AI</text>
+</svg>

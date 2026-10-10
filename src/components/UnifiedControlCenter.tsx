@@ -10,7 +10,7 @@
  * - Integrated Live WhatsApp Customer Simulator with real-time order extraction
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Store,
   Plus,
@@ -43,6 +43,10 @@ import {
   Sliders,
   ExternalLink,
   Play,
+  Mic,
+  MicOff,
+  Volume2,
+  Square,
 } from 'lucide-react';
 import { StoreProfile, MenuItem, SneakerItem, ClothingItem, ChatMessage, OrderDraft } from '../types';
 
@@ -59,7 +63,7 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
 }) => {
   // Store state
   const [stores, setStores] = useState<StoreProfile[]>([]);
-  const [activeStoreId, setActiveStoreId] = useState<string>('pizza-store');
+  const [activeStoreId, setActiveStoreId] = useState<string>('hbb');
   const [activeStore, setActiveStore] = useState<StoreProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [copiedWebhook, setCopiedWebhook] = useState<boolean>(false);
@@ -155,6 +159,77 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
   const [simLoading, setSimLoading] = useState<boolean>(false);
   const [simOrderDraft, setSimOrderDraft] = useState<OrderDraft | null>(null);
 
+  // Voice Recording & Speech-to-Text State
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const [recordSeconds, setRecordSeconds] = useState<number>(0);
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null);
+  const [playingAudioIdx, setPlayingAudioIdx] = useState<number | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordTimerRef = useRef<any>(null);
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Play natural voice TTS for AI reply
+  const handlePlayTts = async (text: string, idx: number) => {
+    if (ttsAudioRef.current) {
+      ttsAudioRef.current.pause();
+      ttsAudioRef.current = null;
+      if (playingAudioIdx === idx) {
+        setPlayingAudioIdx(null);
+        return;
+      }
+    }
+
+    setPlayingAudioIdx(idx);
+    try {
+      const res = await fetch('/api/chat/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.audioBase64) {
+          const audio = new Audio(`data:${data.mimeType || 'audio/wav'};base64,${data.audioBase64}`);
+          ttsAudioRef.current = audio;
+          audio.onended = () => {
+            setPlayingAudioIdx(null);
+            ttsAudioRef.current = null;
+          };
+          audio.onerror = () => {
+            setPlayingAudioIdx(null);
+            ttsAudioRef.current = null;
+          };
+          await audio.play();
+        }
+      }
+    } catch (e) {
+      console.error('TTS error:', e);
+      setPlayingAudioIdx(null);
+    }
+  };
+
+  // Quick 1-click link phone number 01132044823 to restaurant or clothing/sneakers
+  const handleQuickLinkPhone = async (storeId: string) => {
+    try {
+      const res = await fetch('/api/stores/link-quick', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storeId, phone: '01132044823' }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setActiveStoreId(storeId);
+        setActiveStore(data.activeStore);
+        setSaveSuccessMsg(data.message || 'تم ربط الرقم بنجاح');
+        setTimeout(() => setSaveSuccessMsg(''), 4000);
+        if (onStoreSwitched && data.activeStore) onStoreSwitched(data.activeStore);
+      }
+    } catch (err) {
+      console.error('Quick link error:', err);
+    }
+  };
+
   // Fetch all stores
   const fetchStores = async () => {
     try {
@@ -164,7 +239,7 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
         const data = await res.json();
         const storeList: StoreProfile[] = data.stores || [];
         setStores(storeList);
-        const currentActiveId = data.activeStoreId || (storeList[0]?.id ?? 'pizza-store');
+        const currentActiveId = data.activeStoreId || (storeList[0]?.id ?? 'hbb');
         setActiveStoreId(currentActiveId);
         const current = storeList.find((s) => s.id === currentActiveId) || storeList[0] || null;
         setActiveStore(current);
@@ -230,7 +305,7 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
 
   // Copy Webhook URL
   const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com';
-  const currentWebhookUrl = `${currentDomain}/webhook/${activeStore?.id || 'pizza-store'}`;
+  const currentWebhookUrl = `${currentDomain}/webhook/${activeStore?.id || 'hbb'}`;
 
   const handleCopyWebhook = () => {
     navigator.clipboard.writeText(currentWebhookUrl);
@@ -618,6 +693,130 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
     }
   };
 
+  // Handle start real microphone recording
+  const handleStartVoiceRecording = async () => {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setVoiceNotice('⚠️ الميكروفون غير مدعوم في متصفحك الحالي، يمكنك استخدام العينات الصوتية.');
+        setTimeout(() => setVoiceNotice(null), 4000);
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        if (audioChunksRef.current.length === 0) return;
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Data = (reader.result as string).split(',')[1];
+          await handleSendVoiceData(base64Data, mediaRecorder.mimeType || 'audio/webm');
+        };
+        reader.readAsDataURL(audioBlob);
+      };
+
+      mediaRecorder.start(200);
+      setIsRecording(true);
+      setRecordSeconds(0);
+      setVoiceNotice('🔴 جارٍ التسجيل الصوتي... تكلم الآن واضغط على زر الميكروفون للإيقاف والإرسال!');
+
+      recordTimerRef.current = setInterval(() => {
+        setRecordSeconds((prev) => prev + 1);
+      }, 1000);
+    } catch (err: any) {
+      console.error('Failed to start recording:', err);
+      setVoiceNotice('⚠️ يرجى السماح بصلاحية الميكروفون للتحدث.');
+      setTimeout(() => setVoiceNotice(null), 4000);
+    }
+  };
+
+  // Handle stop recording
+  const handleStopVoiceRecording = () => {
+    if (recordTimerRef.current) {
+      clearInterval(recordTimerRef.current);
+      recordTimerRef.current = null;
+    }
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
+  // Dispatch real voice note to backend
+  const handleSendVoiceData = async (base64Audio: string, mimeType: string = 'audio/webm', sampleTextHint?: string) => {
+    if (!activeStore) return;
+    setSimLoading(true);
+    setVoiceNotice('⚡ جارٍ الاستماع للصوت وتفريغه وتوليد رد البوت بالذكاء الاصطناعي...');
+
+    // Optimistic user bubble
+    const tempUserMsg: ChatMessage = {
+      role: 'user',
+      content: sampleTextHint ? `🎙️ [تسجيل صوتي]: "${sampleTextHint}"` : '🎙️ [جارٍ معالجة وتفريغ التسجيل الصوتي...]',
+      timestamp: Date.now(),
+    };
+    setSimMessages((prev) => [...prev, tempUserMsg]);
+
+    try {
+      const res = await fetch('/api/chat/voice-simulate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          phone: activeStore.phone || PRIMARY_LIVE_DEMO_RAW,
+          base64Audio,
+          mimeType,
+          storeId: activeStore.id,
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Update user message with the exact decoded transcription
+        setSimMessages((prev) => {
+          const updated = [...prev];
+          const lastIdx = updated.length - 1;
+          if (lastIdx >= 0 && updated[lastIdx].role === 'user') {
+            updated[lastIdx] = {
+              ...updated[lastIdx],
+              content: `🎙️ [تفريغ الصوت بدقة]: "${data.transcription}"`,
+            };
+          }
+          return [...updated, { role: 'model', content: data.reply, timestamp: Date.now() }];
+        });
+
+        if (data.orderDraft) {
+          setSimOrderDraft(data.orderDraft);
+        }
+        setVoiceNotice(`✅ تم تفريغ الصوت بنجاح: "${data.transcription}"`);
+        setTimeout(() => setVoiceNotice(null), 5000);
+
+        // Auto-play AI voice reply if available
+        if (data.audioReplyBase64) {
+          try {
+            const replyAudio = new Audio(`data:${data.audioMimeType || 'audio/wav'};base64,${data.audioReplyBase64}`);
+            ttsAudioRef.current = replyAudio;
+            replyAudio.play().catch(() => {});
+          } catch (e) {}
+        }
+      }
+    } catch (err) {
+      console.error('Voice send error:', err);
+      setVoiceNotice('⚠️ حدث خطأ في معالجة الصوت.');
+      setTimeout(() => setVoiceNotice(null), 4000);
+    } finally {
+      setSimLoading(false);
+    }
+  };
+
   // Filter items
   const items = activeStore?.items || [];
   const categories = ['All', ...Array.from(new Set(items.map((it: any) => it.category).filter(Boolean)))];
@@ -689,6 +888,40 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
             >
               {copiedDemoPhone ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               <span>{copiedDemoPhone ? 'Number Copied!' : 'Copy Number'}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 1.5 Quick Business Linker for 01132044823 */}
+      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-lg backdrop-blur">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold shrink-0 text-lg">
+              📞
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs font-bold text-white">الربط المباشر للرقم 01132044823 بنشاط تجاري:</span>
+                <span className="text-xs font-mono text-emerald-400 font-bold bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/30">
+                  {activeStore?.name} ({activeStore?.category === 'restaurant' ? '🍕 مطعم' : activeStore?.category === 'sneakers' ? '👟 كوتشيات' : '👕 ملابس'})
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                اضغط بنقرة واحدة لربط رقمك بمتجر HBB Store الرسمي لملابس الشباب والسنيكرز!
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => handleQuickLinkPhone('hbb')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                activeStoreId === 'hbb'
+                  ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-md font-black'
+                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+              }`}
+            >
+              <span>👕👟 متجر HBB الرسمي (ملابس شبابي وسنيكرز)</span>
             </button>
           </div>
         </div>
@@ -957,11 +1190,22 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
                     {/* Item Image Header */}
                     <div className="h-44 w-full bg-slate-950 relative overflow-hidden">
                       <img
-                        src={item.imageUrl || 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80'}
+                        src={
+                          item.imageUrl ||
+                          (isRestaurant
+                            ? 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80'
+                            : isSneakers
+                              ? 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80'
+                              : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80')
+                        }
                         alt={item.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         onError={(e) => {
-                          (e.target as any).src = 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80';
+                          (e.target as any).src = isRestaurant
+                            ? 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80'
+                            : isSneakers
+                              ? 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80'
+                              : 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80';
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
@@ -1069,7 +1313,22 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
 
       {/* 5. VIEW: Integrated Live WhatsApp Simulator */}
       {activeView === 'simulator' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="space-y-4">
+          {/* Navigation Bar to Return to Dashboard/Menu */}
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
+            <button
+              onClick={() => setActiveView('menu')}
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-2 border border-slate-700 cursor-pointer shadow-sm transition-colors"
+            >
+              <ArrowRight className="w-4 h-4 text-emerald-400" />
+              <span>الرجوع إلى لوحة التحكم والكتالوج</span>
+            </button>
+            <span className="text-xs text-slate-400 font-medium">
+              أنت الآن في محاكي الواتساب الحي
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Simulator Phone Container */}
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-[600px] shadow-2xl">
             {/* Phone Header */}
@@ -1124,9 +1383,22 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
                       }`}
                     >
                       {msg.content}
-                      <span className="block text-[9px] text-slate-400 mt-1 text-right opacity-70">
-                        {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      <div className="flex items-center justify-between gap-2 mt-1">
+                        {!isUser && (
+                          <button
+                            type="button"
+                            onClick={() => handlePlayTts(msg.content, mIdx)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-900/60 hover:bg-emerald-800 text-emerald-300 text-[10px] border border-emerald-500/30 cursor-pointer transition-colors"
+                            title="Listen to AI voice reply"
+                          >
+                            <Volume2 className={`w-3 h-3 ${playingAudioIdx === mIdx ? 'animate-pulse text-amber-300' : ''}`} />
+                            <span>{playingAudioIdx === mIdx ? 'جارٍ التشغيل...' : 'استمع للصوت 🔊'}</span>
+                          </button>
+                        )}
+                        <span className="block text-[9px] text-slate-400 opacity-70 ml-auto">
+                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -1145,60 +1417,63 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
             </div>
 
             {/* Quick Prompt Chips */}
-            <div className="bg-slate-950/80 px-3 py-2 border-t border-slate-800/60 overflow-x-auto scrollbar-none flex items-center gap-1.5">
-              <span className="text-[10px] text-slate-400 shrink-0 font-medium">Quick Prompts:</span>
-              {isRestaurant ? (
-                <>
-                  <button
-                    onClick={() => handleSendSimulatorMessage('What pizzas do you have and what are the prices?')}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/20 text-[10px] whitespace-nowrap cursor-pointer"
-                  >
-                    🍕 Menu & Prices
-                  </button>
-                  <button
-                    onClick={() => handleSendSimulatorMessage('I want Pepperoni Pizza Combo with extra mozzarella and spicy jalapenos')}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/20 text-[10px] whitespace-nowrap cursor-pointer"
-                  >
-                    🍟 Combo + Add-ons
-                  </button>
-                  <button
-                    onClick={() => handleSendSimulatorMessage('What is the estimated prep time and delivery fee?')}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-amber-300 border border-amber-500/20 text-[10px] whitespace-nowrap cursor-pointer"
-                  >
-                    ⏱️ Prep Time & Delivery
-                  </button>
-                  <button
-                    onClick={() => handleSendSimulatorMessage('Confirm order: 1 Pepperoni Combo for David, 14 Main Street, phone 01132044823, payment on delivery')}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
-                  >
-                    📝 Confirm Order
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => handleSendSimulatorMessage('Do you have white sneakers in size 43?')}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
-                  >
-                    👟 White Sneakers Size 43
-                  </button>
-                  <button
-                    onClick={() => handleSendSimulatorMessage('How much is the Nike Dunk Panda and can I try it on before paying?')}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
-                  >
-                    🛡️ Dunk Panda & Try-On Policy
-                  </button>
-                  <button
-                    onClick={() => handleSendSimulatorMessage('Register order: Air Jordan 1 Chicago size 44 for John, 22 Park Ave, phone 01132044823')}
-                    className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
-                  >
-                    📦 Book Sneaker Order
-                  </button>
-                </>
-              )}
+            <div className="bg-slate-950/80 px-3 py-2 border-t border-slate-800/60 overflow-x-auto scrollbar-none flex items-center gap-1.5" dir="rtl">
+              <span className="text-[10px] text-slate-400 shrink-0 font-medium">رسائل سريعة للتجربة:</span>
+              <button
+                onClick={() => handleSendSimulatorMessage('عايز اعرف اسعار الهوديز والسنيكرز المتاحة عندكم')}
+                className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
+              >
+                👕 الأسعار المتاحة
+              </button>
+              <button
+                onClick={() => handleSendSimulatorMessage('وزني 76 كجم وطولي 178، ايه المقاس المناسب ليا في الهودي الأوفر سايز؟')}
+                className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
+              >
+                📏 ترشيح مقاس ذكي
+              </button>
+              <button
+                onClick={() => handleSendSimulatorMessage('عندكم كوتشي نايكي دانك باندا مقاس 43؟ وهل المعاينة والقياس مجانية مع المندوب قبل ما ادفع؟')}
+                className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-300 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
+              >
+                👟 دانك باندا وضمان المعاينة
+              </button>
+              <button
+                onClick={() => handleSendSimulatorMessage('أحمد محمود - القاهرة المعادي شارع 9 عمارة 14 - تليفون 01012345678 - دفع عند الاستلام')}
+                className="px-2.5 py-1 rounded-full bg-slate-900 hover:bg-slate-800 text-emerald-400 border border-emerald-500/20 text-[10px] whitespace-nowrap cursor-pointer"
+              >
+                📝 تأكيد أوردر وإشعار التاجر
+              </button>
+
+              {/* Quick Real Voice Simulator Samples */}
+              <button
+                type="button"
+                onClick={() => handleSendSimulatorMessage('🎙️ [فويس نوت]: "مساء الخير يا غالي، عايز اعرف المقاس المناسب لهودي اوفر سايز لوزن 78 كجم وعنواني في المعادي"')}
+                className="px-2.5 py-1 rounded-full bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 text-[10px] whitespace-nowrap flex items-center gap-1 cursor-pointer font-bold"
+                title="محاكاة فويس نوت هودي ومقاسات"
+              >
+                <Volume2 className="w-3 h-3 text-emerald-400" />
+                <span>🎙️ فويس: استفسار هودي ومعادي</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSendSimulatorMessage('🎙️ [فويس نوت]: "السلام عليكم، هل متاح كوتشي نايكي دانك باندا مقاس 43؟ وهل ممكن اقيسه مع المندوب؟"')}
+                className="px-2.5 py-1 rounded-full bg-teal-950/80 hover:bg-teal-900 text-teal-300 border border-teal-500/40 text-[10px] whitespace-nowrap flex items-center gap-1 cursor-pointer font-bold"
+                title="محاكاة فويس نوت سنيكرز"
+              >
+                <Volume2 className="w-3 h-3 text-teal-400" />
+                <span>🎙️ فويس: كوتشي باندا وقياس</span>
+              </button>
             </div>
 
-            {/* Input Bar */}
+            {/* Voice Recording / Status Banner */}
+            {voiceNotice && (
+              <div className="px-3.5 py-1.5 bg-emerald-950/70 border-t border-emerald-500/30 text-emerald-300 text-[11px] flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                <span className="truncate">{voiceNotice}</span>
+              </div>
+            )}
+
+            {/* Input Bar with Microphone & Send */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -1206,16 +1481,39 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
               }}
               className="p-2.5 bg-slate-950 border-t border-slate-800 flex items-center gap-2"
             >
+              {/* Real Microphone Recording Button */}
+              {isRecording ? (
+                <button
+                  type="button"
+                  onClick={handleStopVoiceRecording}
+                  className="px-3 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 animate-pulse cursor-pointer shadow-lg shadow-rose-950/60"
+                  title="Click to stop recording and send voice note"
+                >
+                  <Square className="w-3.5 h-3.5 fill-current" />
+                  <span>{recordSeconds}s Stop & Send</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleStartVoiceRecording}
+                  className="p-2.5 bg-slate-900 hover:bg-emerald-600/30 text-emerald-400 hover:text-emerald-300 border border-slate-800 hover:border-emerald-500/40 rounded-xl transition-all cursor-pointer shrink-0"
+                  title="Record Real Voice Note via your Microphone (Live Speech-to-Text via Gemini)"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+              )}
+
               <input
                 type="text"
                 value={simInput}
                 onChange={(e) => setSimInput(e.target.value)}
-                placeholder="Type customer message or order details..."
+                placeholder={isRecording ? 'Listening to your microphone...' : 'Type message or click mic to record voice note...'}
+                disabled={isRecording}
                 className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
               />
               <button
                 type="submit"
-                disabled={simLoading || !simInput.trim()}
+                disabled={simLoading || !simInput.trim() || isRecording}
                 className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
               >
                 <span>Send</span>
@@ -1287,6 +1585,7 @@ export const UnifiedControlCenter: React.FC<UnifiedControlCenterProps> = ({
             </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* 6. VIEW: Store Policies & Delivery Settings */}

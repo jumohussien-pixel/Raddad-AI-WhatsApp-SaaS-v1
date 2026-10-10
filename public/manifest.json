@@ -1,0 +1,32 @@
+{
+  "id": "/",
+  "name": "Raddad AI — لوحة تحكم التاجر المتنقلة",
+  "short_name": "Raddad AI",
+  "description": "منصة التاجر الذكية لإدارة محادثات واتساب والطلبات والتحكم الفوري في البوت",
+  "start_url": "/?view=merchant-portal",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#090D16",
+  "theme_color": "#005C4B",
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "الطلبات والمندوب",
+      "url": "/?view=merchant-portal&tab=orders",
+      "description": "متابعة أوردرات المحل وحالات الشحن"
+    },
+    {
+      "name": "إيقاف/تشغيل البوت",
+      "url": "/?view=merchant-portal&tab=chats",
+      "description": "التحكم المباشر في ردود الذكاء الاصطناعي"
+    }
+  ]
+}

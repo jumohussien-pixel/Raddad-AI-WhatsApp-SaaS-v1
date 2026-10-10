@@ -49,12 +49,13 @@ const REFILL_RATE_MS = 30000; // 30 seconds to restore full bucket
  */
 const INJECTION_PATTERNS = [
   // Direct Prompt Override
-  /ignore\s+(all\s+|previous\s+|prior\s+)?(instructions|rules|prompts|commands|directives)/i,
+  /ignore\s+(all\s+)?(previous\s+|prior\s+)?(instructions|rules|prompts|commands|directives)/i,
   /تجاهل\s+(جميع\s+|كل\s+)?(التعليمات|الأوامر|القواعد|السيستم)/i,
   /انسى\s+(كل\s+|جميع\s+)?(اللي\s+فات|الأوامر|التعليمات|إنك\s+محل)/i,
   
   // System Prompt Exfiltration
-  /reveal\s+(your\s+)?(system\s+prompt|instructions|api\s+key|rules|initial\s+prompt)/i,
+  /leak\s+(your\s+)?(system\s+prompt|instructions|api\s+keys?|rules|initial\s+prompt)/i,
+  /reveal\s+(your\s+)?(system\s+prompt|instructions|api\s+keys?|rules|initial\s+prompt)/i,
   /what\s+(is|are)\s+your\s+(exact\s+)?(instructions|system\s+prompt|rules|secret)/i,
   /اطبع\s+(التعليمات|البرومبت|السيستم\s+برومبت|الأوامر\s+الأولى)/i,
   /وريني\s+(البرومبت|تعليماتك|الأوامر\s+السرية|كودك)/i,
@@ -175,7 +176,7 @@ export function sanitizeOutboundMessage(text: string): string {
 
   // Patterns for potential secrets (API Keys, Tokens, Env vars)
   const SECRET_PATTERNS = [
-    /AIzaSy[A-Za-z0-9_-]{33}/g, // Google Gemini API Key pattern
+    /AIzaSy[A-Za-z0-9_-]{8,64}/g, // Google Gemini API Key pattern
     /[a-f0-9]{50,64}/gi,        // Green API Token (64 hex characters)
     /710722741559/g,            // Direct internal instance IDs
     /process\.env\.[A-Za-z0-9_]+/g,

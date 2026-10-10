@@ -43,7 +43,7 @@ interface MultiStoreManagerProps {
 
 export const MultiStoreManager: React.FC<MultiStoreManagerProps> = ({ onStoreSwitched }) => {
   const [stores, setStores] = useState<StoreProfile[]>([]);
-  const [activeStoreId, setActiveStoreId] = useState<string>('pizza-store');
+  const [activeStoreId, setActiveStoreId] = useState<string>('hbb');
   const [loading, setLoading] = useState<boolean>(true);
   const [copiedPrompt, setCopiedPrompt] = useState<boolean>(false);
   const [copiedWebhookId, setCopiedWebhookId] = useState<string | null>(null);
@@ -297,40 +297,15 @@ export const MultiStoreManager: React.FC<MultiStoreManagerProps> = ({ onStoreSwi
 
         {/* Visual Architecture Flow */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          {/* F&B Tenant */}
-          <div className="bg-slate-950/80 rounded-xl p-4 border border-amber-500/30 relative">
+          {/* Single Dedicated Tenant: HBB Store */}
+          <div className="bg-slate-950/80 rounded-xl p-4 border border-emerald-500/30 relative col-span-full">
             <div className="flex items-center justify-between mb-2">
               <span className="font-bold text-white flex items-center gap-1.5 text-sm">
-                <Utensils className="w-4 h-4 text-amber-400" />
-                Bella Roma Pizza & Pastas
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-mono">
-                Store #1 (F&B)
-              </span>
-            </div>
-            <div className="text-xs text-slate-300 space-y-1.5">
-              <div className="flex items-center gap-1 text-[11px] text-slate-400">
-                <Smartphone className="w-3.5 h-3.5 text-slate-400" />
-                <span>Configured Phone: <strong className="font-mono text-slate-200">+20 100 000 0001</strong></span>
-              </div>
-              <div className="bg-slate-900 p-2 rounded-lg font-mono text-[11px] text-amber-300 break-all select-all">
-                {currentDomain}/webhook/pizza-store
-              </div>
-              <p className="text-[11px] text-slate-400 leading-normal">
-                Handles pizza sizes (Single, Combo, Family), extra cheese, spicy toppings, and 25-minute kitchen prep time.
-              </p>
-            </div>
-          </div>
-
-          {/* Footwear Tenant (Primary User Number) */}
-          <div className="bg-slate-950/80 rounded-xl p-4 border border-emerald-500/30 relative">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-white flex items-center gap-1.5 text-sm">
-                <Footprints className="w-4 h-4 text-emerald-400" />
-                HML Sneakers & Footwear
+                <Shirt className="w-4 h-4 text-emerald-400" />
+                HBB Store (Youth Streetwear & Sneakers)
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono">
-                Primary Demo
+                Active Production Store
               </span>
             </div>
             <div className="text-xs text-slate-300 space-y-1.5">
@@ -339,35 +314,10 @@ export const MultiStoreManager: React.FC<MultiStoreManagerProps> = ({ onStoreSwi
                 <span>Configured Phone: <strong className="font-mono text-emerald-300">{PRIMARY_LIVE_PHONE}</strong></span>
               </div>
               <div className="bg-slate-900 p-2 rounded-lg font-mono text-[11px] text-emerald-300 break-all select-all">
-                {currentDomain}/webhook/hml
+                {currentDomain}/webhook/hbb
               </div>
               <p className="text-[11px] text-slate-400 leading-normal">
-                Master-quality sneakers, sizes 40-46, colors, and inspect-before-pay delivery guarantees.
-              </p>
-            </div>
-          </div>
-
-          {/* Apparel Tenant */}
-          <div className="bg-slate-950/80 rounded-xl p-4 border border-indigo-500/30 relative">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-bold text-white flex items-center gap-1.5 text-sm">
-                <Shirt className="w-4 h-4 text-indigo-400" />
-                HPP Streetwear & Apparel
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 font-mono">
-                Store #4 (Retail)
-              </span>
-            </div>
-            <div className="text-xs text-slate-300 space-y-1.5">
-              <div className="flex items-center gap-1 text-[11px] text-slate-400">
-                <Smartphone className="w-3.5 h-3.5 text-slate-400" />
-                <span>Configured Phone: <strong className="font-mono text-slate-200">+20 100 000 0004</strong></span>
-              </div>
-              <div className="bg-slate-900 p-2 rounded-lg font-mono text-[11px] text-indigo-300 break-all select-all">
-                {currentDomain}/webhook/hpp
-              </div>
-              <p className="text-[11px] text-slate-400 leading-normal">
-                100% Egyptian cotton oversized tees, cool-feel linen shirts, and 6-pocket cargo utility pants.
+                المتجر النشط الوحيد: هوديز أوفر سايز، تيشيرتات أسيد واش، بناطيل كارغو، وسنيكرز ماستر كواليتي بأسعار الجنيه المصري حصراً (EGP).
               </p>
             </div>
           </div>
@@ -612,7 +562,7 @@ export const MultiStoreManager: React.FC<MultiStoreManagerProps> = ({ onStoreSwi
                         id: e.target.value.toLowerCase().replace(/\s+/g, '-'),
                       })
                     }
-                    placeholder="e.g. pizza-store, my-brand"
+                    placeholder="e.g. hbb-store, youth-brand"
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono"
                   />
                 </div>
@@ -671,7 +621,7 @@ export const MultiStoreManager: React.FC<MultiStoreManagerProps> = ({ onStoreSwi
                   type="text"
                   value={editingStore.tagline || ''}
                   onChange={(e) => setEditingStore({ ...editingStore, tagline: e.target.value })}
-                  placeholder="e.g. Authentic Italian artisan pizzas and fresh pasta bowls delivered piping hot."
+                  placeholder="مثال: المتجر الرسمي لملابس الشباب العصرية والكوتشيات السنيكرز ماستر كواليتي."
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
                 />
               </div>

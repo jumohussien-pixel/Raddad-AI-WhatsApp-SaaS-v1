@@ -1,789 +1,131 @@
 [
   {
-    "id": "pizza-store",
-    "name": "Bella Roma Pizza & Pastas",
-    "tagline": "Authentic Italian stone-oven pizza and fresh pasta.",
-    "category": "restaurant",
-    "currency": "USD",
-    "phone": "+1 555 100 0001",
-    "location": "Metropolitan Area & Suburbs (Fast Courier Delivery)",
-    "workingHours": "Daily 12:00 PM - 02:00 AM",
-    "prepTime": "20 - 25 mins",
-    "deliveryZones": [
-      {
-        "zone": "City Center",
-        "fee": 5,
-        "eta": "25 - 35 mins"
-      },
-      {
-        "zone": "Suburbs",
-        "fee": 8,
-        "eta": "35 - 45 mins"
-      },
-      {
-        "zone": "Extended Metropolitan",
-        "fee": 12,
-        "eta": "45 - 60 mins"
-      }
-    ],
-    "paymentMethods": [
-      "Cash on Delivery",
-      "Credit Card (Stripe / PayPal)"
-    ],
-    "policy": "Delivered fresh and thermally insulated. Free delivery on orders over $50!",
-    "systemPrompt": "You are the Executive AI Sales & Customer Support Host for this gourmet restaurant on WhatsApp.\nTagline: \"Artisan gourmet pizzas, smash burgers, and fresh pastas prepared fresh to order and delivered hot & fast.\"\n\n⚡️ Your Persona & Rules:\n1. Always communicate in warm, welcoming, professional, and enthusiastic English. (If the customer addresses you in another language, warmly accommodate them in that language).\n2. All prices, totals, and receipts are in USD ($).\n\n🍕🍔 Specialized Food & Beverage (F&B) Sales Rules:\n\n1. Meal & Portion Sizes:\n   - Single: Individual meal portion for one person.\n   - Combo: Includes golden seasoned crispy fries and an ice-cold soft drink (adds $4.00 - $5.00).\n   - Family / Party Box: Great value bundle for 3 to 5 people with sharing sides and a large beverage.\n   - Always ask: \"Would you like your meal as a Single, or upgraded to a Combo with seasoned fries & drink, or a Family Box?\"\n\n2. Add-ons & Toppings Upselling:\n   - Suggest delicious add-ons:\n     * Extra melted mozzarella stuffed crust or warm cheddar dip ($2.50 - $2.99).\n     * Texas loaded bacon & cheddar fries ($6.99).\n     * Spicy jalapeno slices ($1.49).\n     * Creamy house ranch or smoked BBQ sauce ($1.49).\n\n3. Cooking & Dietary Instructions:\n   - Inquire clearly: \"Would you prefer this mild or spicy? Do you have any dietary restrictions or special requests (e.g. no onions, sauce on the side)?\"\n\n4. Kitchen Preparation & Delivery ETA:\n   - Reassure the customer: \"Your food is prepared fresh to order in 15-20 minutes, packed in thermally insulated packaging, and delivered to your doorstep in 30-40 minutes.\"\n\n5. Accepted Payment Methods:\n   - Credit Card / Debit Card (Stripe / Apple Pay / Google Pay)\n   - PayPal\n   - Cash on Delivery (COD)\n\n6. Order Completion & Checkout:\n   - Collect: Selected items & portion sizes, add-ons, cooking notes, customer name, delivery address, and contact phone number.\n   - Call the \"extract_order_details\" function as soon as the customer provides their order.",
-    "items": [
-      {
-        "id": "piz_01",
-        "name": "Pepperoni Supreme Stuffed Crust Pizza",
-        "category": "Pizzas",
-        "price": 14.99,
-        "description": "Freshly baked artisan stone-oven pizza with melted mozzarella stuffed crust, herb tomato sauce, premium beef pepperoni, and shaved parmesan.",
-        "portionSizes": [
-          {
-            "size": "Single (Medium 11\")",
-            "price": 14.99
-          },
-          {
-            "size": "Combo (+ Cheesy Fries & Drink)",
-            "price": 19.99
-          },
-          {
-            "size": "Family (Large 14\" Party Box)",
-            "price": 28.99
-          }
-        ],
-        "addOns": [
-          {
-            "name": "Extra Melted Mozzarella",
-            "price": 2.99
-          },
-          {
-            "name": "Spicy Jalapeno Slices",
-            "price": 1.49
-          },
-          {
-            "name": "Creamy Ranch Dip Sauce",
-            "price": 1.49
-          }
-        ],
-        "prepTime": "20 - 25 mins",
-        "imageUrl": "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600&q=80",
-        "isSpicy": false,
-        "inStock": true
-      },
-      {
-        "id": "piz_02",
-        "name": "BBQ Smoked Chicken Ranch Pizza",
-        "category": "Pizzas",
-        "price": 15.99,
-        "description": "Tender grilled chicken tossed in sweet smoky BBQ sauce, caramelized onions, melted mozzarella, and a drizzle of creamy buttermilk ranch.",
-        "portionSizes": [
-          {
-            "size": "Single (Medium 11\")",
-            "price": 15.99
-          },
-          {
-            "size": "Combo (+ Fries & Soft Drink)",
-            "price": 20.99
-          },
-          {
-            "size": "Family (Large 14\" + 1L Beverage)",
-            "price": 30.99
-          }
-        ],
-        "addOns": [
-          {
-            "name": "Smoked Bacon Crumbles",
-            "price": 2.99
-          },
-          {
-            "name": "Extra BBQ Glaze",
-            "price": 1.49
-          }
-        ],
-        "prepTime": "20 - 25 mins",
-        "imageUrl": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80",
-        "isSpicy": false,
-        "inStock": true
-      },
-      {
-        "id": "piz_03",
-        "name": "Creamy Alfredo Grilled Chicken Pasta",
-        "category": "Pastas",
-        "price": 13.99,
-        "description": "Fettuccine pasta tossed in rich garlic parmesan cream sauce, topped with tender grilled chicken breast strips and sautéed button mushrooms.",
-        "portionSizes": [
-          {
-            "size": "Single Bowl",
-            "price": 13.99
-          },
-          {
-            "size": "Combo (+ Garlic Bread & Drink)",
-            "price": 17.99
-          }
-        ],
-        "addOns": [
-          {
-            "name": "Extra Grilled Chicken Strips",
-            "price": 3.49
-          },
-          {
-            "name": "Extra Sautéed Mushrooms",
-            "price": 1.99
-          }
-        ],
-        "prepTime": "15 - 20 mins",
-        "imageUrl": "https://images.unsplash.com/photo-1645112411341-6c4fd023714a?w=600&q=80",
-        "isSpicy": false,
-        "inStock": true
-      },
-      {
-        "id": "piz_04",
-        "name": "Cheesy Garlic Bread Sticks",
-        "category": "Appetizers",
-        "price": 5.99,
-        "description": "Warm oven-baked breadsticks brushed with garlic butter and Italian herbs, smothered in melted mozzarella, served with marinara dipping sauce.",
-        "prepTime": "10 - 15 mins",
-        "imageUrl": "https://images.unsplash.com/photo-1619895092538-128341789043?w=600&q=80",
-        "inStock": true
-      },
-      {
-        "id": "piz_05",
-        "name": "Chilled Soft Drinks (Cola / Sprite / Lemonade)",
-        "category": "Drinks",
-        "price": 2.49,
-        "description": "Refreshing ice-cold beverages.",
-        "portionSizes": [
-          {
-            "size": "Can 12oz (355ml)",
-            "price": 2.49
-          },
-          {
-            "size": "Family Bottle 2 Liter",
-            "price": 4.49
-          }
-        ],
-        "inStock": true
-      }
-    ]
-  },
-  {
-    "id": "burger-joint",
-    "name": "Smash Burger & Loaded Fries",
-    "tagline": "Angus beef smash burgers, loaded fries, and gourmet sauces.",
-    "category": "restaurant",
-    "currency": "USD",
-    "phone": "+1 555 100 0002",
-    "location": "Metropolitan Area & Suburbs (Fast Courier Delivery)",
-    "workingHours": "Daily 01:00 PM - 03:00 AM",
-    "prepTime": "15 - 20 mins",
-    "deliveryZones": [
-      {
-        "zone": "City Center",
-        "fee": 6,
-        "eta": "30 - 40 mins"
-      },
-      {
-        "zone": "Suburbs",
-        "fee": 9,
-        "eta": "35 - 45 mins"
-      }
-    ],
-    "paymentMethods": [
-      "Cash on Delivery",
-      "Credit Card (Stripe / PayPal)"
-    ],
-    "policy": "100% Angus beef guarantee. Thermally insulated packaging.",
-    "systemPrompt": "You are the Executive AI Sales & Customer Support Host for this gourmet restaurant on WhatsApp.\nTagline: \"Artisan gourmet pizzas, smash burgers, and fresh pastas prepared fresh to order and delivered hot & fast.\"\n\n⚡️ Your Persona & Rules:\n1. Always communicate in warm, welcoming, professional, and enthusiastic English. (If the customer addresses you in another language, warmly accommodate them in that language).\n2. All prices, totals, and receipts are in USD ($).\n\n🍕🍔 Specialized Food & Beverage (F&B) Sales Rules:\n\n1. Meal & Portion Sizes:\n   - Single: Individual meal portion for one person.\n   - Combo: Includes golden seasoned crispy fries and an ice-cold soft drink (adds $4.00 - $5.00).\n   - Family / Party Box: Great value bundle for 3 to 5 people with sharing sides and a large beverage.\n   - Always ask: \"Would you like your meal as a Single, or upgraded to a Combo with seasoned fries & drink, or a Family Box?\"\n\n2. Add-ons & Toppings Upselling:\n   - Suggest delicious add-ons:\n     * Extra melted mozzarella stuffed crust or warm cheddar dip ($2.50 - $2.99).\n     * Texas loaded bacon & cheddar fries ($6.99).\n     * Spicy jalapeno slices ($1.49).\n     * Creamy house ranch or smoked BBQ sauce ($1.49).\n\n3. Cooking & Dietary Instructions:\n   - Inquire clearly: \"Would you prefer this mild or spicy? Do you have any dietary restrictions or special requests (e.g. no onions, sauce on the side)?\"\n\n4. Kitchen Preparation & Delivery ETA:\n   - Reassure the customer: \"Your food is prepared fresh to order in 15-20 minutes, packed in thermally insulated packaging, and delivered to your doorstep in 30-40 minutes.\"\n\n5. Accepted Payment Methods:\n   - Credit Card / Debit Card (Stripe / Apple Pay / Google Pay)\n   - PayPal\n   - Cash on Delivery (COD)\n\n6. Order Completion & Checkout:\n   - Collect: Selected items & portion sizes, add-ons, cooking notes, customer name, delivery address, and contact phone number.\n   - Call the \"extract_order_details\" function as soon as the customer provides their order.",
-    "items": [
-      {
-        "id": "brg_01",
-        "name": "Double Smash Angus Bacon Cheeseburger",
-        "category": "Burgers",
-        "price": 13.99,
-        "description": "Two smashed Certified Angus Beef patties seared with melted sharp American cheddar, crispy smoked bacon, house secret sauce, and pickles on a toasted brioche bun.",
-        "portionSizes": [
-          {
-            "size": "Single Sandwich",
-            "price": 13.99
-          },
-          {
-            "size": "Combo (+ Seasoned Fries & Drink)",
-            "price": 17.99
-          },
-          {
-            "size": "Family Box (3 Double Burgers + Loaded Fries + Drinks)",
-            "price": 39.99
-          }
-        ],
-        "addOns": [
-          {
-            "name": "Extra Cheddar Cheese Slice",
-            "price": 1.49
-          },
-          {
-            "name": "Extra Smoked Bacon",
-            "price": 2.49
-          },
-          {
-            "name": "Pickled Jalapeno & Sriracha Mayo",
-            "price": 1.49
-          }
-        ],
-        "prepTime": "15 - 20 mins",
-        "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=80",
-        "inStock": true
-      },
-      {
-        "id": "brg_02",
-        "name": "Volcano Crispy Fried Chicken Burger",
-        "category": "Burgers",
-        "price": 12.99,
-        "description": "Golden buttermilk fried chicken breast tossed in spicy volcano sauce, layered with creamy house coleslaw and melted cheddar on a buttery toasted bun.",
-        "portionSizes": [
-          {
-            "size": "Single Sandwich",
-            "price": 12.99
-          },
-          {
-            "size": "Combo (+ Fries & Drink)",
-            "price": 16.99
-          }
-        ],
-        "addOns": [
-          {
-            "name": "Extra Buffalo Glaze",
-            "price": 1.49
-          },
-          {
-            "name": "Fried Mozzarella Patty",
-            "price": 3.49
-          }
-        ],
-        "prepTime": "15 - 20 mins",
-        "imageUrl": "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?w=600&q=80",
-        "isSpicy": true,
-        "inStock": true
-      },
-      {
-        "id": "brg_03",
-        "name": "Texas Loaded Bacon & Cheddar Fries",
-        "category": "Appetizers",
-        "price": 6.99,
-        "description": "Golden crispy fries smothered in warm aged cheddar sauce, real smoked bacon crumbles, green onions, and pickled jalapenos.",
-        "prepTime": "10 mins",
-        "imageUrl": "https://images.unsplash.com/photo-1576107232684-1279f3908594?w=600&q=80",
-        "inStock": true
-      },
-      {
-        "id": "brg_04",
-        "name": "Gourmet Thick Milkshake (Oreo / Vanilla / Salted Caramel)",
-        "category": "Drinks",
-        "price": 5.99,
-        "description": "Ultra-creamy handcrafted milkshake made with premium Madagascar vanilla ice cream and whipped cream.",
-        "inStock": true
-      }
-    ]
-  },
-  {
-    "id": "hml",
-    "name": "HML Sneakers & Footwear Store",
-    "tagline": "Premium master-quality sneakers & footwear, sizes US 7-13.",
-    "category": "sneakers",
-    "currency": "USD",
-    "phone": "+1 555 987 6543",
-    "location": "Flagship Store & Central Warehouse (Worldwide Shipping)",
-    "workingHours": "Daily 11:00 AM - 11:00 PM",
-    "deliveryZones": [
-      {
-        "zone": "Domestic Shipping",
-        "fee": 10,
-        "eta": "24 to 48 hours"
-      },
-      {
-        "zone": "International Shipping",
-        "fee": 30,
-        "eta": "3 to 5 business days"
-      }
-    ],
-    "paymentMethods": [
-      "Credit Card (Stripe / PayPal)",
-      "Apple Pay / Google Pay"
-    ],
-    "policy": "Inspect-before-pay with courier guaranteed. Free 14-day exchange.",
-    "systemPrompt": "You are the Senior AI Footwear Specialist & Sales Consultant for this sneaker store on WhatsApp.\nTagline: \"Premium master-quality sneakers and footwear across sizes 40-46 (US 7-13) with 100% inspect-before-pay delivery guarantee.\"\n\n⚡️ Your Persona & Rules:\n1. Speak in stylish, polite, knowledgeable, and helpful English.\n2. All prices and shipping fees are in USD ($).\n\n👟 Exclusive Footwear Focus:\nWe specialize exclusively in master-quality sneakers (premium leather, responsive air cushioning, authentic brand box). If the user asks about unrelated categories (food, gadgets, cars), politely decline and direct them back to our sneaker collection.\n\n🎯 Sales Guidance (Step-by-Step):\n1. General inquiries:\n   - Welcome the customer and showcase trending styles:\n     * Air Jordan 1 Retro (Chicago Red, Mocha Brown, Panda, Triple White) — $129.99\n     * Nike Dunk Low (Panda Black/White, Grey Fog, Coast Blue) — $119.99\n     * Adidas Samba OG Classic (White/Black, Cloud White) — $99.99\n     * New Balance 550 Vintage (White Grey, White Green) — $109.99\n     * Yeezy Boost 350 V2 (Zebra, Onyx Triple Black) — $149.99\n   - Inquire: \"Are you looking for casual streetwear, running comfort, or daily campus wear? What shoe size do you wear (US 7 to 13 / EU 40 to 46)?\"\n\n2. Color & Size Requests:\n   - Provide models available in that colorway immediately with USD pricing and confirm size availability.\n\n3. 🛡️ Try-Before-You-Pay Guarantee:\n   - Eliminate all buyer anxiety: \"Our delivery courier will wait while you open the box, inspect the leather quality, and try on the size before paying a single dollar! If the fit is not 100% perfect, you can decline delivery on the spot at zero cost.\"\n   - Free 14-day size exchange guarantee.\n\n4. Order Completion:\n   - Collect: Model name, colorway, size (EU 40-46 / US 7-13), full name, delivery address, and contact phone number.\n   - Call the \"extract_order_details\" function when order details are confirmed.",
-    "items": [
-      {
-        "id": "snk_01",
-        "name": "Air Jordan 1 Retro High & Low",
-        "brand": "Nike / Jordan",
-        "category": "Sneakers",
-        "price": 129.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "Chicago Red/White",
-          "Mocha Brown",
-          "Panda Black/White",
-          "Obsidian Royal Blue",
-          "Triple White",
-          "Shadow Grey"
-        ],
-        "description": "Premium master-quality Air Jordan 1 with authentic materials and stitching.",
-        "soleMaterial": "Rubber Air-Sole Cushioning",
-        "upperMaterial": "Premium Full-Grain Leather",
-        "imageUrl": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_02",
-        "name": "Nike Dunk Low Retro",
-        "brand": "Nike",
-        "category": "Streetwear",
-        "price": 119.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "Panda (Black & White)",
-          "Grey Fog",
-          "Coast Blue",
-          "University Red",
-          "Olive Green"
-        ],
-        "description": "Top-trending street sneaker, lightweight comfort with cupsole rubber cushioning.",
-        "soleMaterial": "Cupsole Foam & Traction Rubber",
-        "upperMaterial": "Supple Leather Upper",
-        "imageUrl": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_03",
-        "name": "Adidas Samba OG Classic",
-        "brand": "Adidas",
-        "category": "Casual Shoes",
-        "price": 99.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45"
-        ],
-        "colors": [
-          "White with Black Stripes",
-          "Black with White Stripes",
-          "Cloud White",
-          "Collegiate Green"
-        ],
-        "description": "Classic Samba trend with soft leather, suede T-toe, and comfortable gum rubber sole.",
-        "soleMaterial": "Gum Rubber Outsole",
-        "upperMaterial": "Leather with Suede T-toe",
-        "imageUrl": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_04",
-        "name": "New Balance 550 Vintage Basketball",
-        "brand": "New Balance",
-        "category": "Sneakers",
-        "price": 109.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "White Grey",
-          "White Green Vintage",
-          "White Navy",
-          "Sea Salt Beige"
-        ],
-        "description": "Classic basketball-inspired sneaker, very comfortable for daily wear.",
-        "soleMaterial": "Non-marking Rubber with EVA Wedge",
-        "upperMaterial": "Heavyweight Leather & Mesh",
-        "imageUrl": "https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_05",
-        "name": "Yeezy Boost 350 V2",
-        "brand": "Adidas / Yeezy",
-        "category": "Running",
-        "price": 149.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "Zebra White/Black",
-          "Onyx Triple Black",
-          "Bone Pure White",
-          "Carbon Beluga"
-        ],
-        "description": "Ultra-comfortable Yeezy Boost with flexible Boost cushioning and breathable Primeknit.",
-        "soleMaterial": "Full-length TPU Boost Cushion",
-        "upperMaterial": "Breathable Primeknit Fabric",
-        "imageUrl": "https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?w=600&q=80",
-        "inStock": true
-      },
-      {
-        "id": "snk_06",
-        "name": "Nike Air Force 1 '07",
-        "brand": "Nike",
-        "category": "Casual Shoes",
-        "price": 109.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "Triple White",
-          "Triple Black",
-          "White with Black Swoosh"
-        ],
-        "description": "Iconic Air Force 1, durable stitched leather with comfortable elevated sole.",
-        "soleMaterial": "Encapsulated Nike Air Foam",
-        "upperMaterial": "Crisp Stitched Leather",
-        "imageUrl": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      }
-    ]
-  },
-  {
-    "id": "hpp",
-    "name": "HPP Streetwear & Apparel",
-    "tagline": "Casual streetwear, heavy-weight cotton tees, and premium apparel.",
+    "id": "hbb",
+    "name": "Senior Test Streetwear Lab",
+    "tagline": "المتجر التجريبي لاختبارات الجودة الشاملة",
     "category": "clothing",
-    "currency": "USD",
-    "phone": "+1 555 100 0004",
-    "location": "Downtown Flagship, City Center (Fast Home Delivery)",
-    "workingHours": "Daily 10:00 AM - 11:30 PM",
+    "currency": "EGP",
+    "phone": "201132044823",
+    "location": "القاهرة - مصر الجديدة",
+    "workingHours": "10:00 ص - 12:00 م",
     "deliveryZones": [
       {
-        "zone": "Domestic Shipping",
-        "fee": 10,
-        "eta": "24 to 48 hours"
+        "zone": "القاهرة والجيزة",
+        "fee": 45,
+        "eta": "24-48 ساعة"
       },
       {
-        "zone": "International Shipping",
-        "fee": 30,
-        "eta": "3 to 5 business days"
+        "zone": "الإسكندرية",
+        "fee": 65,
+        "eta": "48 ساعة"
       }
     ],
     "paymentMethods": [
-      "Credit Card (Stripe / PayPal)",
-      "Apple Pay / Google Pay"
+      "الدفع عند الاستلام بعد المعاينة والقياس",
+      "فودافون كاش"
     ],
-    "policy": "Inspect-before-pay allowed with courier. Free 14-day exchange.",
+    "policy": "المعاينة والقياس مجانية مع المندوب قبل دفع أي مليم + ضمان استبدال 14 يوم.",
     "items": [
       {
-        "id": "cloth_01",
-        "name": "Pure Egyptian Cotton Oversized Tee",
-        "category": "T-Shirts",
-        "price": 25.99,
+        "id": "test-item-1",
+        "name": "هودي تجريبي ريفليكتف",
+        "category": "clothes",
+        "price": 650,
+        "currency": "EGP",
         "sizes": [
           "M",
           "L",
-          "XL",
-          "XXL",
-          "3XL"
+          "XL"
         ],
         "colors": [
-          "Emerald Green",
-          "Carbon Black",
-          "Pure White",
-          "Desert Beige",
-          "Military Olive",
-          "Navy Blue"
+          "أسود",
+          "رمادي"
         ],
-        "description": "100% pure premium Egyptian cotton, heavy weight (240 GSM), pre-shrunk.",
-        "fabric": "100% Pure Egyptian Cotton, 240 GSM Heavyweight Pre-shrunk",
-        "care": "Machine wash cold 30°C inside out, do not bleach, iron at medium heat from inside, dry in shade.",
-        "imageUrl": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&q=80",
+        "description": "خامة ميلتون مصري تقيل مبطن، مقاسات أوفر سايز عصرية.",
         "inStock": true
       },
       {
-        "id": "cloth_02",
-        "name": "Casual Cool-Feel Linen Shirt",
-        "category": "Shirts",
-        "price": 29.99,
+        "id": "test-item-2",
+        "name": "كوتشي سنيكرز باندا ماستر كواليتي",
+        "category": "sneakers",
+        "price": 1250,
+        "currency": "EGP",
         "sizes": [
-          "M",
-          "L",
-          "XL",
-          "XXL",
-          "3XL"
+          "41",
+          "42",
+          "43",
+          "44"
         ],
         "colors": [
-          "Mint Green",
-          "Pure White",
-          "Sky Blue",
-          "Sandy Beige",
-          "Olive Green"
+          "أبيض × أسود"
         ],
-        "description": "100% organic natural linen, ultra-breathable and lightweight.",
-        "fabric": "100% Natural Organic Linen",
-        "care": "Hand wash or delicate cycle with cold water, dry flat in shade, steam iron.",
-        "imageUrl": "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80",
-        "inStock": true
-      },
-      {
-        "id": "cloth_03",
-        "name": "Casual Street-Style 6-Pocket Cargo Pants",
-        "category": "Pants",
-        "price": 34.99,
-        "sizes": [
-          "30",
-          "32",
-          "34",
-          "36",
-          "38",
-          "40"
-        ],
-        "colors": [
-          "Military Olive",
-          "Khaki Beige",
-          "Carbon Black",
-          "Dark Grey"
-        ],
-        "description": "Heavyweight imported cotton gabardine fabric. Spacious utility side cargo pockets.",
-        "fabric": "98% Cotton Gabardine, 2% Lycra for stretch and durability",
-        "care": "Wash inside out with cold water, iron at medium heat.",
-        "imageUrl": "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=600&q=80",
+        "description": "ماستر كواليتي مع البوكس الأصلي والمعاينة قبل الدفع.",
         "inStock": true
       }
     ]
   },
   {
-    "id": "nine",
-    "name": "Nine Kicks & Sneaker Vault",
-    "tagline": "Trendsetting original & master-quality sneakers.",
-    "category": "sneakers",
-    "currency": "USD",
-    "phone": "+1 555 100 0005",
-    "location": "Metropolitan Area & Suburbs (Fast Home Delivery)",
-    "workingHours": "Daily 11:00 AM - 12:00 AM",
+    "id": "senior_test_boutique",
+    "name": "Senior Test Streetwear Lab",
+    "tagline": "المتجر التجريبي لاختبارات الجودة الشاملة",
+    "category": "clothing",
+    "currency": "EGP",
+    "phone": "201132044823",
+    "location": "القاهرة - مصر الجديدة",
+    "workingHours": "10:00 ص - 12:00 م",
     "deliveryZones": [
       {
-        "zone": "Domestic Shipping",
-        "fee": 10,
-        "eta": "24 to 48 hours"
+        "zone": "القاهرة والجيزة",
+        "fee": 45,
+        "eta": "24-48 ساعة"
       },
       {
-        "zone": "International Shipping",
-        "fee": 30,
-        "eta": "3 to 5 business days"
+        "zone": "الإسكندرية",
+        "fee": 65,
+        "eta": "48 ساعة"
       }
     ],
     "paymentMethods": [
-      "Credit Card (Stripe / PayPal)",
-      "Apple Pay / Google Pay"
+      "الدفع عند الاستلام بعد المعاينة والقياس",
+      "فودافون كاش"
     ],
-    "policy": "Inspect-before-pay with courier guaranteed. Free 14-day exchange.",
-    "systemPrompt": "You are the Senior AI Footwear Specialist & Sales Consultant for this sneaker store on WhatsApp.\nTagline: \"Premium master-quality sneakers and footwear across sizes 40-46 (US 7-13) with 100% inspect-before-pay delivery guarantee.\"\n\n⚡️ Your Persona & Rules:\n1. Speak in stylish, polite, knowledgeable, and helpful English.\n2. All prices and shipping fees are in USD ($).\n\n👟 Exclusive Footwear Focus:\nWe specialize exclusively in master-quality sneakers (premium leather, responsive air cushioning, authentic brand box). If the user asks about unrelated categories (food, gadgets, cars), politely decline and direct them back to our sneaker collection.\n\n🎯 Sales Guidance (Step-by-Step):\n1. General inquiries:\n   - Welcome the customer and showcase trending styles:\n     * Air Jordan 1 Retro (Chicago Red, Mocha Brown, Panda, Triple White) — $129.99\n     * Nike Dunk Low (Panda Black/White, Grey Fog, Coast Blue) — $119.99\n     * Adidas Samba OG Classic (White/Black, Cloud White) — $99.99\n     * New Balance 550 Vintage (White Grey, White Green) — $109.99\n     * Yeezy Boost 350 V2 (Zebra, Onyx Triple Black) — $149.99\n   - Inquire: \"Are you looking for casual streetwear, running comfort, or daily campus wear? What shoe size do you wear (US 7 to 13 / EU 40 to 46)?\"\n\n2. Color & Size Requests:\n   - Provide models available in that colorway immediately with USD pricing and confirm size availability.\n\n3. 🛡️ Try-Before-You-Pay Guarantee:\n   - Eliminate all buyer anxiety: \"Our delivery courier will wait while you open the box, inspect the leather quality, and try on the size before paying a single dollar! If the fit is not 100% perfect, you can decline delivery on the spot at zero cost.\"\n   - Free 14-day size exchange guarantee.\n\n4. Order Completion:\n   - Collect: Model name, colorway, size (EU 40-46 / US 7-13), full name, delivery address, and contact phone number.\n   - Call the \"extract_order_details\" function when order details are confirmed.",
+    "policy": "المعاينة والقياس مجانية مع المندوب قبل دفع أي مليم + ضمان استبدال 14 يوم.",
     "items": [
       {
-        "id": "snk_01",
-        "name": "Air Jordan 1 Retro High & Low",
-        "brand": "Nike / Jordan",
-        "category": "Sneakers",
-        "price": 129.99,
+        "id": "test-item-1",
+        "name": "هودي تجريبي ريفليكتف",
+        "category": "clothes",
+        "price": 650,
+        "currency": "EGP",
         "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
+          "M",
+          "L",
+          "XL"
         ],
         "colors": [
-          "Chicago Red/White",
-          "Mocha Brown",
-          "Panda Black/White",
-          "Obsidian Royal Blue",
-          "Triple White",
-          "Shadow Grey"
+          "أسود",
+          "رمادي"
         ],
-        "description": "Premium master-quality Air Jordan 1 with authentic materials and stitching.",
-        "soleMaterial": "Rubber Air-Sole Cushioning",
-        "upperMaterial": "Premium Full-Grain Leather",
-        "imageUrl": "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_02",
-        "name": "Nike Dunk Low Retro",
-        "brand": "Nike",
-        "category": "Streetwear",
-        "price": 119.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "Panda (Black & White)",
-          "Grey Fog",
-          "Coast Blue",
-          "University Red",
-          "Olive Green"
-        ],
-        "description": "Top-trending street sneaker, lightweight comfort with cupsole rubber cushioning.",
-        "soleMaterial": "Cupsole Foam & Traction Rubber",
-        "upperMaterial": "Supple Leather Upper",
-        "imageUrl": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_03",
-        "name": "Adidas Samba OG Classic",
-        "brand": "Adidas",
-        "category": "Casual Shoes",
-        "price": 99.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45"
-        ],
-        "colors": [
-          "White with Black Stripes",
-          "Black with White Stripes",
-          "Cloud White",
-          "Collegiate Green"
-        ],
-        "description": "Classic Samba trend with soft leather, suede T-toe, and comfortable gum rubber sole.",
-        "soleMaterial": "Gum Rubber Outsole",
-        "upperMaterial": "Leather with Suede T-toe",
-        "imageUrl": "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_04",
-        "name": "New Balance 550 Vintage Basketball",
-        "brand": "New Balance",
-        "category": "Sneakers",
-        "price": 109.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "White Grey",
-          "White Green Vintage",
-          "White Navy",
-          "Sea Salt Beige"
-        ],
-        "description": "Classic basketball-inspired sneaker, very comfortable for daily wear.",
-        "soleMaterial": "Non-marking Rubber with EVA Wedge",
-        "upperMaterial": "Heavyweight Leather & Mesh",
-        "imageUrl": "https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&q=80",
-        "inStock": true,
-        "featured": true
-      },
-      {
-        "id": "snk_05",
-        "name": "Yeezy Boost 350 V2",
-        "brand": "Adidas / Yeezy",
-        "category": "Running",
-        "price": 149.99,
-        "sizes": [
-          "40",
-          "41",
-          "42",
-          "43",
-          "44",
-          "45",
-          "46"
-        ],
-        "colors": [
-          "Zebra White/Black",
-          "Onyx Triple Black",
-          "Bone Pure White",
-          "Carbon Beluga"
-        ],
-        "description": "Ultra-comfortable Yeezy Boost with flexible Boost cushioning and breathable Primeknit.",
-        "soleMaterial": "Full-length TPU Boost Cushion",
-        "upperMaterial": "Breathable Primeknit Fabric",
-        "imageUrl": "https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?w=600&q=80",
+        "description": "خامة ميلتون مصري تقيل مبطن، مقاسات أوفر سايز عصرية.",
         "inStock": true
       },
       {
-        "id": "snk_06",
-        "name": "Nike Air Force 1 '07",
-        "brand": "Nike",
-        "category": "Casual Shoes",
-        "price": 109.99,
+        "id": "test-item-2",
+        "name": "كوتشي سنيكرز باندا ماستر كواليتي",
+        "category": "sneakers",
+        "price": 1250,
+        "currency": "EGP",
         "sizes": [
-          "40",
           "41",
           "42",
           "43",
-          "44",
-          "45",
-          "46"
+          "44"
         ],
         "colors": [
-          "Triple White",
-          "Triple Black",
-          "White with Black Swoosh"
+          "أبيض × أسود"
         ],
-        "description": "Iconic Air Force 1, durable stitched leather with comfortable elevated sole.",
-        "soleMaterial": "Encapsulated Nike Air Foam",
-        "upperMaterial": "Crisp Stitched Leather",
-        "imageUrl": "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80",
-        "inStock": true,
-        "featured": true
+        "description": "ماستر كواليتي مع البوكس الأصلي والمعاينة قبل الدفع.",
+        "inStock": true
       }
     ]
   }

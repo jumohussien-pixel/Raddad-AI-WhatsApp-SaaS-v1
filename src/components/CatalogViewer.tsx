@@ -19,8 +19,8 @@ import {
   ShieldCheck,
   X,
 } from 'lucide-react';
-import { BusinessProfile, ClothingItem } from '../server/catalogData';
-import { StoreProfile } from '../types';
+import { BusinessProfile } from '../server/catalogData';
+import { StoreProfile, ClothingItem } from '../types';
 
 interface CatalogViewerProps {
   storeId?: string;
@@ -450,7 +450,7 @@ export const CatalogViewer: React.FC<CatalogViewerProps> = ({
                   <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-[11px] text-slate-400">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="font-medium text-slate-300">Sizes:</span>
-                      {cloth.sizes?.map((sz, i) => (
+                      {cloth.sizes?.map((sz: string, i: number) => (
                         <span key={i} className="px-2 py-0.5 bg-slate-900 text-slate-200 rounded border border-slate-800 text-[10px]">
                           {sz}
                         </span>
@@ -459,7 +459,7 @@ export const CatalogViewer: React.FC<CatalogViewerProps> = ({
 
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="font-medium text-slate-300">Colors:</span>
-                      {cloth.colors?.map((col, i) => (
+                      {cloth.colors?.map((col: string, i: number) => (
                         <span key={i} className="px-2 py-0.5 bg-slate-900 text-slate-200 rounded border border-slate-800 text-[10px]">
                           {col}
                         </span>

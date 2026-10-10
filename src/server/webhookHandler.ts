@@ -45,6 +45,11 @@ export interface WhatsAppRuntimeConfig {
     phoneNumberId: string;
     accessToken: string;
   };
+  phone?: string;
+  ownerPhone?: string;
+  storeId?: string;
+  storeName?: string;
+  storeCategory?: string;
 }
 
 export const DEFAULT_GREEN_API_INSTANCE_ID = '710722741559';
@@ -208,12 +213,18 @@ export function parseIncomingWebhook(body: any, query: any = {}): WebhookParseRe
       body.messageData?.templateButtonsResponseMessageData?.selectedButtonId ||
       '';
 
-    if (typeMessage === 'audioMessage') {
+    if (
+      typeMessage === 'audioMessage' ||
+      typeMessage === 'voiceMessage' ||
+      body.messageData?.fileMessageData?.mimeType?.startsWith('audio/') ||
+      body.messageData?.fileMessageData?.fileName?.endsWith('.oga') ||
+      body.messageData?.fileMessageData?.fileName?.endsWith('.ogg')
+    ) {
       mediaType = 'audio';
       mediaUrl = body.messageData?.fileMessageData?.downloadUrl || body.messageData?.downloadUrl;
       mimeType = body.messageData?.fileMessageData?.mimeType || 'audio/ogg';
       caption = body.messageData?.fileMessageData?.caption || '';
-      text = caption ? `[Customer Voice Note]: ${caption}` : '[Customer Voice Note via WhatsApp]';
+      text = caption ? `[Customer Voice Note]: ${caption}` : '[Customer Spoken Voice Note via WhatsApp]';
     } else if (typeMessage === 'imageMessage') {
       mediaType = 'image';
       mediaUrl = body.messageData?.fileMessageData?.downloadUrl || body.messageData?.downloadUrl;

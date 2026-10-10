@@ -11,6 +11,8 @@ import {
   Camera,
   Mic,
   Image as ImageIcon,
+  Square,
+  Volume2,
 } from 'lucide-react';
 import { ChatMessage, OrderDraft, StoreProfile } from '../types';
 
@@ -33,8 +35,55 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
   const [orderDraft, setOrderDraft] = useState<OrderDraft | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [attachedImagePreview, setAttachedImagePreview] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+  const [playingMsgIdx, setPlayingMsgIdx] = useState<number | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const recordTimerRef = useRef<any>(null);
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Real TTS Playback of AI responses
+  const handlePlayTts = async (text: string, idx: number) => {
+    if (ttsAudioRef.current) {
+      ttsAudioRef.current.pause();
+      ttsAudioRef.current = null;
+      if (playingMsgIdx === idx) {
+        setPlayingMsgIdx(null);
+        return;
+      }
+    }
+
+    setPlayingMsgIdx(idx);
+    try {
+      const res = await fetch('/api/chat/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.audioBase64) {
+          const audio = new Audio(`data:${data.mimeType || 'audio/wav'};base64,${data.audioBase64}`);
+          ttsAudioRef.current = audio;
+          audio.onended = () => {
+            setPlayingMsgIdx(null);
+            ttsAudioRef.current = null;
+          };
+          audio.onerror = () => {
+            setPlayingMsgIdx(null);
+            ttsAudioRef.current = null;
+          };
+          await audio.play();
+        }
+      }
+    } catch (e) {
+      console.error('TTS error:', e);
+      setPlayingMsgIdx(null);
+    }
+  };
 
   // Auto-scroll to bottom of chat
   const scrollToBottom = () => {
@@ -63,15 +112,10 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
         console.error('Failed to load session:', e);
       }
 
-      // Default welcome message
-      const isSneakers = businessType === 'sneakers' || activeStore?.category === 'sneakers';
-      const storeName = activeStore?.name || (isSneakers ? 'HML Sneakers Store' : 'HPP Fashion Store');
+      // Default welcome message for HBB Store (100% Egyptian Arabic)
+      const storeName = activeStore?.name || 'HBB Store';
       const defaultWelcome =
-        businessType === 'restaurant'
-          ? `Welcome to ${storeName}! 🍕🔥 Authentic Italian stone-oven pizzas, smash burgers, and fresh pastas prepared fresh in ~20 mins. All prices in USD ($). What can I get started for you today?`
-          : isSneakers
-          ? `Welcome to ${storeName}! 👟🔥 Premium master-quality sneakers & footwear across sizes US 7-13 (EU 40-46) with 100% inspect-before-pay delivery guarantee! Which model or size are you looking for?`
-          : `Welcome to ${storeName}! 👔 Discover our premium streetwear, 100% fine cotton tees, and casual shirts with try-before-buy delivery! How can I assist you today?`;
+        `أهلاً بحضرتك يا فندم في متجر ${storeName}! 👕👟\nأفضل خامات ملابس شبابي عصرية وسنيكرز ماستر كواليتي، بأسعار الجنيه المصري مع ميزة المعاينة والقياس مجاناً مع المندوب قبل ما تدفع أي جنيه! 🛡️\nتحب تشوف الهوديز، التيشيرتات، الكارغو، ولا السنيكرز؟ ✨`;
 
       setMessages([{ role: 'model', content: defaultWelcome, timestamp: Date.now() }]);
       setOrderDraft(null);
@@ -165,6 +209,109 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
     e.target.value = '';
   };
 
+  const handleStartRecording = async () => {
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        alert('Microphone recording is not supported in this browser.');
+        return;
+      }
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioChunksRef.current = [];
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
+        stream.getTracks().forEach((track) => track.stop());
+        if (audioChunksRef.current.length === 0) return;
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType || 'audio/webm' });
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64Data = (reader.result as string).split(',')[1];
+          setIsLoading(true);
+          setMessages((prev) => [
+            ...prev,
+            { role: 'user', content: '🎙️ [Processing Voice Recording...]', timestamp: Date.now() },
+          ]);
+
+          try {
+            const res = await fetch('/api/chat/voice-simulate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                phone: phoneNumber,
+                base64Audio: base64Data,
+                mimeType: mediaRecorder.mimeType || 'audio/webm',
+                storeId: storeId || activeStore?.id,
+              }),
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              setMessages((prev) => {
+                const list = [...prev];
+                const lastIdx = list.length - 1;
+                if (lastIdx >= 0 && list[lastIdx].role === 'user') {
+                  list[lastIdx] = {
+                    ...list[lastIdx],
+                    content: `🎙️ [Voice Note Transcribed]: "${data.transcription}"`,
+                  };
+                }
+                return [...list, { role: 'model', content: data.reply, timestamp: Date.now() }];
+              });
+
+              if (data.orderDraft) {
+                setOrderDraft(data.orderDraft);
+              }
+              if (onSessionUpdated) onSessionUpdated();
+
+              // Auto-play AI voice reply if generated
+              if (data.audioReplyBase64) {
+                try {
+                  const replyAudio = new Audio(`data:${data.audioMimeType || 'audio/wav'};base64,${data.audioReplyBase64}`);
+                  ttsAudioRef.current = replyAudio;
+                  replyAudio.play().catch(() => {});
+                } catch (e) {}
+              }
+            }
+          } catch (err) {
+            console.error('Failed to send voice note:', err);
+          } finally {
+            setIsLoading(false);
+          }
+        };
+        reader.readAsDataURL(audioBlob);
+      };
+
+      mediaRecorder.start(200);
+      setIsRecording(true);
+      setRecordSeconds(0);
+      recordTimerRef.current = setInterval(() => {
+        setRecordSeconds((prev) => prev + 1);
+      }, 1000);
+    } catch (err: any) {
+      console.error('Failed to start microphone:', err);
+      alert('Could not access microphone. Please allow microphone permissions.');
+    }
+  };
+
+  const handleStopRecording = () => {
+    if (recordTimerRef.current) {
+      clearInterval(recordTimerRef.current);
+      recordTimerRef.current = null;
+    }
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
+
   const handleSendSampleVoiceNote = () => {
     handleSendMessage('[Voice note from customer]: I weigh 185 lbs and I am 5 feet 10 inches tall. Which size fits me for an oversized tee and cargo pants?', {
       mediaType: 'audio',
@@ -193,36 +340,16 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
   };
 
   const isSneakers = businessType === 'sneakers' || activeStore?.category === 'sneakers';
-  const storeName = activeStore?.name || (isSneakers ? 'HML Sneakers Store' : businessType === 'restaurant' ? 'Al-Prins' : 'Modern Style Fashion');
+  const storeName = activeStore?.name || 'HBB Store';
 
-  const quickPrompts =
-    businessType === 'restaurant'
-      ? [
-          'Show me the menu and prices please',
-          'Do you deliver to Maadi, and how much is shipping?',
-          'I want to order 2 Al-Prins special Koshary and a soda',
-          'John Smith - 12 El-Nasr St, Maadi, Apt 4 - phone 01012345678 - pay via Vodafone Cash',
-        ]
-      : isSneakers
-      ? [
-          'Do you have Air Jordan 1 Retro in size 43?',
-          'What colors are available for Adidas Samba OG?',
-          'Do you have white sneakers in size 43?',
-          'What is the price of Air Jordan 1 Retro and what colorways are in stock?',
-          'Is inspect-before-pay allowed with courier?',
-          'New Balance 550 vintage in size 44',
-          'John Doe - 120 Broadway St, New York, Apt 4 - phone +1 555 987 6543 - cash on delivery',
-          'Can I order 2 pizzas? (Testing out-of-domain rejection for footwear)',
-        ]
-      : [
-          'I want an oversized heavy cotton tee in size L',
-          'Hi! What colors are available for the Linen shirt?',
-          'What are the dimensions and colors for the pure cotton tee?',
-          'I weigh 180 lbs, what size should I order?',
-          'Do you have utility cargo pants in Black?',
-          'Sarah Connor - 450 Sunset Blvd, Los Angeles - phone +1 555 100 0004 - credit card',
-          'I want 2 burgers and fries (Testing out-of-domain rejection)',
-        ];
+  const quickPrompts = [
+    'عايز اعرف اسعار الهوديز والسنيكرز المتاحة بالجنيه المصري',
+    'وزني 76 كجم وطولي 178، ايه انسب مقاس ليا في الهودي الأوفر سايز؟',
+    'عندكم كوتشي نايكي دانك باندا مقاس 43؟',
+    'هل المعاينة والقياس مجانية مع المندوب قبل ما ادفع؟',
+    'الشحن للقاهرة والجيزة كام وبياخد وقت أد ايه؟',
+    'أحمد محمود - القاهرة المعادي شارع 9 - 01012345678 - دفع كاش عند الاستلام',
+  ];
 
   return (
     <div id="whatsapp-simulator-wrapper" className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -307,15 +434,28 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                       }`}
                     >
                       <div className="whitespace-pre-wrap font-sans break-words">{msg.content}</div>
-                      <div
-                        className={`flex items-center gap-1 mt-1 justify-end text-[10px] ${
-                          isUser ? 'text-emerald-200/70' : 'text-slate-400'
-                        }`}
-                      >
-                        <span>
-                          {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        {isUser && <CheckCheck className="w-3.5 h-3.5 text-sky-400 inline" />}
+                      <div className="flex items-center justify-between gap-2 mt-1.5">
+                        {!isUser && (
+                          <button
+                            type="button"
+                            onClick={() => handlePlayTts(msg.content, idx)}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#2a3942] hover:bg-[#32444f] text-emerald-400 text-[10px] border border-emerald-500/20 cursor-pointer transition-colors"
+                            title="Play voice reply via Gemini TTS"
+                          >
+                            <Volume2 className={`w-3 h-3 ${playingMsgIdx === idx ? 'animate-pulse text-amber-300' : ''}`} />
+                            <span>{playingMsgIdx === idx ? 'Playing Voice...' : 'Listen 🔊'}</span>
+                          </button>
+                        )}
+                        <div
+                          className={`flex items-center gap-1 text-[10px] ${
+                            isUser ? 'text-emerald-200/70 ml-auto' : 'text-slate-400 ml-auto'
+                          }`}
+                        >
+                          <span>
+                            {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {isUser && <CheckCheck className="w-3.5 h-3.5 text-sky-400 inline" />}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -416,14 +556,26 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                 <ImageIcon className="w-4 h-4 text-emerald-400" />
               </button>
 
-              <button
-                type="button"
-                onClick={handleSendSampleVoiceNote}
-                title="Send sample customer voice note (audio)"
-                className="w-9 h-9 rounded-xl bg-[#2a3942] hover:bg-slate-700 text-slate-300 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <Mic className="w-4 h-4 text-sky-400" />
-              </button>
+              {isRecording ? (
+                <button
+                  type="button"
+                  onClick={handleStopRecording}
+                  className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white flex items-center gap-1.5 text-xs font-bold animate-pulse cursor-pointer shrink-0 shadow-md"
+                  title="Click to Stop Recording and Transcribe Audio with Gemini"
+                >
+                  <Square className="w-3.5 h-3.5 fill-current" />
+                  <span>{recordSeconds}s Stop</span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleStartRecording}
+                  title="Record Voice Note via your Microphone (Live Gemini STT)"
+                  className="w-9 h-9 rounded-xl bg-[#2a3942] hover:bg-slate-700 text-slate-300 hover:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <Mic className="w-4 h-4 text-emerald-400" />
+                </button>
+              )}
 
               <input
                 id="whatsapp-message-input"
@@ -515,7 +667,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                       {it.sizeOrColor && <span className="text-slate-400 mr-1">({it.sizeOrColor})</span>}
                     </div>
                     <span className="font-mono text-emerald-400">
-                      {it.quantity} × {it.price ? `$${Number(it.price).toFixed(2)}` : '-'}
+                      {it.quantity} × {it.price ? `${Math.round(Number(it.price))} جنيه مصري` : '-'}
                     </span>
                   </div>
                 ))}
@@ -525,7 +677,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                 <div className="p-2 bg-slate-950 rounded-lg text-xs border border-slate-800/80 flex items-start gap-2">
                   <MapPin className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-slate-400 block">Delivery Address:</span>
+                    <span className="text-slate-400 block">عنوان التوصيل:</span>
                     <span className="text-slate-200 font-medium">{orderDraft.address}</span>
                   </div>
                 </div>
@@ -535,7 +687,7 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
                 <div className="p-2 bg-slate-950 rounded-lg text-xs border border-slate-800/80 flex items-center gap-2">
                   <CreditCard className="w-4 h-4 text-sky-400 shrink-0" />
                   <div>
-                    <span className="text-slate-400">Payment Method:</span>{' '}
+                    <span className="text-slate-400">طريقة الدفع:</span>{' '}
                     <span className="text-slate-200 font-medium">{orderDraft.paymentMethod}</span>
                   </div>
                 </div>
@@ -543,9 +695,9 @@ export const WhatsAppSimulator: React.FC<WhatsAppSimulatorProps> = ({
 
               {orderDraft.totalEstimated ? (
                 <div className="p-2.5 bg-emerald-950/40 rounded-xl border border-emerald-500/30 flex justify-between items-center text-xs">
-                  <span className="font-medium text-emerald-300">Total Estimated:</span>
+                  <span className="font-medium text-emerald-300">الإجمالي التقديري:</span>
                   <span className="text-sm font-bold font-mono text-emerald-200">
-                    ${Number(orderDraft.totalEstimated).toFixed(2)}
+                    {Math.round(Number(orderDraft.totalEstimated))} جنيه مصري
                   </span>
                 </div>
               ) : null}
